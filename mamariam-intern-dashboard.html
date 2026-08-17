@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papan Skor — Intern Mamariam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12131c;
+    --surface:#1a1c29;
+    --surface-2:#20222f;
+    --line:#2c2f42;
+    --text:#f2f0ea;
+    --text-muted:#8b8da3;
+    --live:#ff6b4a;
+    --live-dim:#4a2b23;
+    --wa:#3ecf8e;
+    --wa-dim:#1f3a30;
+    --gold:#f5b942;
+    --danger:#e5566b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 20px 80px;
+  }
+  .wrap{max-width:1120px;margin:0 auto;}
+
+  /* header */
+  header{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:16px;flex-wrap:wrap;
+    margin-bottom:28px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:20px;
+  }
+  .brand-eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--gold);margin:0 0 6px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(28px,4vw,38px);
+    font-weight:700;margin:0;letter-spacing:-.01em;
+  }
+  header .sub{color:var(--text-muted);font-size:14px;margin-top:6px;}
+  .header-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  select, input[type=date], input[type=number], input[type=text]{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:9px 12px;
+    border-radius:9px;
+    outline:none;
+  }
+  select:focus, input:focus{border-color:var(--gold);}
+  button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;font-size:14px;
+    border:none;border-radius:9px;
+    padding:9px 16px;cursor:pointer;
+    background:var(--gold);color:#1a1305;
+    transition:filter .15s ease, transform .1s ease;
+  }
+  button:hover{filter:brightness(1.08);}
+  button:active{transform:scale(.98);}
+  button.ghost{
+    background:transparent;border:1px solid var(--line);color:var(--text);
+  }
+  button.ghost:hover{border-color:var(--text-muted);}
+  button.small{padding:6px 10px;font-size:12px;}
+  button.danger-ghost{background:transparent;border:1px solid var(--line);color:var(--danger);}
+  button.danger-ghost:hover{border-color:var(--danger);}
+
+  /* scorecards */
+  .scores{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;
+  }
+  @media(max-width:760px){.scores{grid-template-columns:1fr;}}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+  }
+  .score-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-muted);margin:0 0 10px;
+  }
+  .score-value{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:36px;font-weight:700;line-height:1;
+    display:flex;align-items:baseline;gap:6px;
+  }
+  .score-value small{font-size:16px;font-weight:500;color:var(--text-muted);}
+  .score-foot{margin-top:10px;font-size:12.5px;color:var(--text-muted);}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+
+  /* progress section */
+  .section-title{
+    font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;
+    margin:32px 0 14px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .section-title .hint{font-family:'Inter',sans-serif;font-weight:400;font-size:12.5px;color:var(--text-muted);}
+  .progress-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media(max-width:760px){.progress-grid{grid-template-columns:1fr;}}
+  .prog-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;}
+  .prog-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+  .prog-range{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:14px;}
+  .bar-track{
+    position:relative;height:10px;border-radius:6px;background:var(--surface-2);
+    overflow:hidden;margin-bottom:8px;
+  }
+  .bar-fill{height:100%;display:flex;}
+  .bar-seg-live{background:var(--live);}
+  .bar-seg-wa{background:var(--wa);}
+  .prog-nums{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);}
+  .prog-nums b{color:var(--text);font-weight:600;}
+
+  /* climb chart */
+  .climb-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 8px;}
+  .climb-legend{display:flex;gap:18px;font-size:12px;color:var(--text-muted);margin-bottom:10px;flex-wrap:wrap;}
+  .climb-legend span{display:flex;align-items:center;}
+  svg text{font-family:'JetBrains Mono',monospace;}
+
+  /* channel breakdown */
+  .channels{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  @media(max-width:900px){.channels{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.channels{grid-template-columns:1fr;}}
+  .chan-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+  .chan-name{font-size:12.5px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;}
+  .chan-row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;color:var(--text-muted);border-top:1px dashed var(--line);}
+  .chan-row:first-of-type{border-top:none;}
+  .chan-row b{color:var(--text);font-family:'JetBrains Mono',monospace;font-weight:500;}
+
+  /* form */
+  .form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .form-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:end;}
+  @media(max-width:900px){.form-grid{grid-template-columns:repeat(2,1fr);}}
+  .field label{display:block;font-size:11px;color:var(--text-muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase;}
+  .field input, .field select{width:100%;}
+  .form-msg{margin-top:12px;font-size:13px;color:var(--wa);min-height:16px;}
+
+  /* history */
+  .hist-controls{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{
+    text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);
+    padding:8px 10px;border-bottom:1px solid var(--line);font-weight:500;
+  }
+  tbody td{padding:9px 10px;border-bottom:1px solid var(--line);}
+  tbody tr:hover{background:var(--surface-2);}
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;
+    font-size:11px;font-weight:600;
+  }
+  .chip .dot{width:6px;height:6px;margin-right:0;}
+  .chip-wa{background:var(--wa-dim);color:var(--wa);}
+  .chip-live{background:var(--live-dim);color:var(--live);}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px;}
+  .row-actions{display:flex;gap:6px;}
+
+  /* settings modal */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(10,10,15,.6);
+    display:none;align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;max-width:420px;width:100%;
+  }
+  .modal h3{font-family:'Space Grotesk',sans-serif;margin:0 0 4px;font-size:19px;}
+  .modal p.desc{color:var(--text-muted);font-size:13px;margin:0 0 18px;}
+  .modal .field{margin-bottom:14px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+
+  footer{margin-top:50px;text-align:center;color:var(--text-muted);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="brand-eyebrow">Mamariam — Sales Ops</p>
+      <h1>Papan Skor Intern</h1>
+      <p class="sub">Live + WhatsApp blasting sales, hari demi hari.</p>
+    </div>
+    <div class="header-controls">
+      <select id="monthSelect"></select>
+      <button class="ghost" id="btnSettings">⚙ Target</button>
+    </div>
+  </header>
+
+  <!-- SCORECARDS -->
+  <div class="scores">
+    <div class="card">
+      <p class="score-label">Overall Sales (RM)</p>
+      <div class="score-value" id="scOverall">0</div>
+      <p class="score-foot" id="scOverallFoot">0 leads · 0 buyer</p>
+    </div>
+    <div class="card">
+      <p class="score-label"><span class="dot" style="background:var(--live)"></span>Sales Live (RM)</p>
+      <div class="score-value" id="scLive">0</div>
+      <p class="score-foot" id="scLiveFoot">Shopee + TikTok Solusi + TikTok Mamayuyu</p>
+    </div>
+    <div class="card">
+      <p class="score-label"><span class="dot" style="background:var(--wa)"></span>Sales WhatsApp (RM)</p>
+      <div class="score-value" id="scWa">0</div>
+      <p class="score-foot" id="scWaFoot">Closing rate: —</p>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="section-title">Progress Target Bulanan <span class="hint">Suku · Separuh · Full Bulan</span></div>
+  <div class="progress-grid" id="progressGrid"></div>
+
+  <!-- DAILY CLIMB -->
+  <div class="section-title">Daily Climb <span class="hint">Kumulatif jualan vs pace target sepanjang bulan</span></div>
+  <div class="climb-card">
+    <div class="climb-legend">
+      <span><span class="dot" style="background:var(--gold)"></span>Pace Target</span>
+      <span><span class="dot" style="background:var(--live)"></span>Live</span>
+      <span><span class="dot" style="background:var(--wa)"></span>WhatsApp</span>
+    </div>
+    <div id="climbChart"></div>
+  </div>
+
+  <!-- CHANNEL BREAKDOWN -->
+  <div class="section-title">Breakdown Ikut Channel</div>
+  <div class="channels" id="channelGrid"></div>
+
+  <!-- FORM -->
+  <div class="section-title">Tambah Entry Harian</div>
+  <div class="form-card">
+    <div class="form-grid">
+      <div class="field">
+        <label>Tarikh</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="field">
+        <label>Channel</label>
+        <select id="fChannel">
+          <option value="whatsapp">WhatsApp</option>
+          <option value="live_shopee">Live Shopee</option>
+          <option value="live_tiktok_solusi">Live TikTok Solusi</option>
+          <option value="live_tiktok_mamayuyu">Live TikTok Mamayuyu</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Leads</label>
+        <input type="number" id="fLeads" min="0" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Buyer</label>
+        <input type="number" id="fBuyer" min="0" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Sales (RM)</label>
+        <input type="number" id="fSales" min="0" placeholder="0">
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;">
+      <button id="btnAdd">+ Simpan Entry</button>
+      <button class="ghost" id="btnClearForm">Kosongkan</button>
+    </div>
+    <p class="form-msg" id="formMsg"></p>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="section-title">Sejarah Entry</div>
+  <div class="hist-controls">
+    <select id="histChannelFilter">
+      <option value="all">Semua channel</option>
+      <option value="whatsapp">WhatsApp</option>
+      <option value="live_shopee">Live Shopee</option>
+      <option value="live_tiktok_solusi">Live TikTok Solusi</option>
+      <option value="live_tiktok_mamayuyu">Live TikTok Mamayuyu</option>
+    </select>
+  </div>
+  <div class="form-card" style="padding:0;overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Tarikh</th><th>Channel</th><th>Leads</th><th>Buyer</th><th>Sales (RM)</th><th>CR</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="histBody"></tbody>
+    </table>
+    <div id="histEmpty" class="empty-state" style="display:none;">Belum ada entry untuk bulan &amp; channel ni. Tambah entry pertama di atas.</div>
+  </div>
+
+  <footer>Data disimpan terus dalam Claude — tiada perlu login. Dibina untuk pasukan Mamariam.</footer>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <h3>Set Target Bulanan</h3>
+    <p class="desc">Target untuk bulan <b id="modalMonthLabel"></b>. Suku/Separuh Bulan dikira automatik ikut peratus hari.</p>
+    <div class="field">
+      <label>Target WhatsApp (RM)</label>
+      <input type="number" id="tgtWa" min="0">
+    </div>
+    <div class="field">
+      <label>Target Live — jumlah 3 channel (RM)</label>
+      <input type="number" id="tgtLive" min="0">
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="btnCancelSettings">Batal</button>
+      <button id="btnSaveSettings">Simpan Target</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const CHANNELS = {
+    whatsapp: { label:'WhatsApp', group:'wa', color:'var(--wa)' },
+    live_shopee: { label:'Live Shopee', group:'live', color:'var(--live)' },
+    live_tiktok_solusi: { label:'Live TikTok Solusi', group:'live', color:'var(--live)' },
+    live_tiktok_mamayuyu: { label:'Live TikTok Mamayuyu', group:'live', color:'var(--live)' }
+  };
+  const DEFAULT_TARGET = { whatsapp: 5000, live: 7000 };
+
+  let entries = [];
+  let targets = {}; // { 'YYYY-MM': {whatsapp:n, live:n} }
+  let currentMonth = monthKey(new Date());
+
+  function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+  function daysInMonth(mk){ const [y,m] = mk.split('-').map(Number); return new Date(y, m, 0).getDate(); }
+  function fmtRM(n){ return 'RM ' + (Math.round(n*100)/100).toLocaleString('en-MY',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+  function fmtNum(n){ return (n||0).toLocaleString('en-MY'); }
+  function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function uid(){ return 'e_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+  // ---------- storage ----------
+  async function loadData(){
+    try{
+      const r = await window.storage.get('entries');
+      entries = r && r.value ? JSON.parse(r.value) : [];
+    }catch(e){ entries = []; }
+    try{
+      const r2 = await window.storage.get('targets');
+      targets = r2 && r2.value ? JSON.parse(r2.value) : {};
+    }catch(e){ targets = {}; }
+  }
+  async function saveEntries(){
+    try{ await window.storage.set('entries', JSON.stringify(entries)); }
+    catch(e){ console.error('save entries failed', e); }
+  }
+  async function saveTargets(){
+    try{ await window.storage.set('targets', JSON.stringify(targets)); }
+    catch(e){ console.error('save targets failed', e); }
+  }
+  function getTarget(mk){
+    return targets[mk] || { ...DEFAULT_TARGET };
+  }
+
+  // ---------- month select ----------
+  function populateMonthSelect(){
+    const sel = document.getElementById('monthSelect');
+    const set = new Set(entries.map(e => e.date.slice(0,7)));
+    set.add(currentMonth);
+    const list = Array.from(set).sort().reverse();
+    sel.innerHTML = list.map(mk => `<option value="${mk}">${monthLabel(mk)}</option>`).join('');
+    sel.value = currentMonth;
+  }
+  function monthLabel(mk){
+    const [y,m] = mk.split('-').map(Number);
+    const d = new Date(y, m-1, 1);
+    return d.toLocaleDateString('ms-MY', { month:'long', year:'numeric' });
+  }
+
+  // ---------- computations ----------
+  function entriesForMonth(mk, channelFilter){
+    return entries.filter(e => e.date.slice(0,7) === mk && (!channelFilter || channelFilter==='all' || e.channel===channelFilter));
+  }
+  function sumField(list, field){ return list.reduce((s,e)=> s + (Number(e[field])||0), 0); }
+
+  function render(){
+    const mk = currentMonth;
+    const monthEntries = entriesForMonth(mk);
+    const waEntries = monthEntries.filter(e => CHANNELS[e.channel].group==='wa');
+    const liveEntries = monthEntries.filter(e => CHANNELS[e.channel].group==='live');
+
+    const overallSales = sumField(monthEntries,'sales');
+    const overallLeads = sumField(monthEntries,'leads');
+    const overallBuyer = sumField(monthEntries,'buyer');
+    const waSales = sumField(waEntries,'sales');
+    const liveSales = sumField(liveEntries,'sales');
+    const waLeads = sumField(waEntries,'leads');
+    const waBuyer = sumField(waEntries,'buyer');
+
+    document.getElementById('scOverall').textContent = fmtRM(overallSales).replace('RM ','');
+    document.getElementById('scOverallFoot').textContent = `${fmtNum(overallLeads)} leads · ${fmtNum(overallBuyer)} buyer`;
+    document.getElementById('scLive').textContent = fmtRM(liveSales).replace('RM ','');
+    document.getElementById('scWa').textContent = fmtRM(waSales).replace('RM ','');
+    const waCR = waLeads > 0 ? ((waBuyer/waLeads)*100).toFixed(1)+'%' : '—';
+    document.getElementById('scWaFoot').textContent = `Closing rate: ${waCR}`;
+
+    renderProgress(mk, waSales, liveSales);
+    renderClimb(mk, waEntries, liveEntries);
+    renderChannels(mk, monthEntries);
+    renderHistory();
+    populateMonthSelect();
+  }
+
+  function renderProgress(mk, waSales, liveSales){
+    const dim = daysInMonth(mk);
+    const tgt = getTarget(mk);
+    const checkpoints = [
+      { label:'Suku Bulan', range:'1HB – 10HB', pct: Math.min(10,dim)/dim },
+      { label:'Separuh Bulan', range:'1HB – 20HB', pct: Math.min(20,dim)/dim },
+      { label:'Full Bulan', range:`1HB – ${dim}HB`, pct: 1 }
+    ];
+    const grid = document.getElementById('progressGrid');
+    grid.innerHTML = checkpoints.map(cp => {
+      const waTgt = tgt.whatsapp * cp.pct;
+      const liveTgt = tgt.live * cp.pct;
+      const totalTgt = waTgt + liveTgt;
+      const totalAch = waSales + liveSales;
+      const pctAch = totalTgt > 0 ? Math.min(100, (totalAch/totalTgt)*100) : 0;
+      const liveShare = totalAch>0 ? (Math.min(liveSales,totalTgt)/Math.max(totalAch,1))*pctAch : 0;
+      const waShare = Math.max(0, pctAch - liveShare);
+      return `
+        <div class="prog-card">
+          <div class="prog-title">${cp.label}</div>
+          <div class="prog-range">${cp.range}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pctAch}%">
+              <div class="bar-seg-live" style="width:${totalAch>0 ? (liveSales/totalAch*100) : 0}%"></div>
+              <div class="bar-seg-wa" style="width:${totalAch>0 ? (waSales/totalAch*100) : 0}%"></div>
+            </div>
+          </div>
+          <div class="prog-nums">
+            <span><b>${fmtRM(totalAch)}</b></span>
+            <span>target ${fmtRM(totalTgt)}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderClimb(mk, waEntries, liveEntries){
+    const dim = daysInMonth(mk);
+    const tgt = getTarget(mk);
+    const dailyTarget = (tgt.whatsapp + tgt.live) / dim;
+
+    // build cumulative arrays
+    const waByDay = new Array(dim+1).fill(0);
+    const liveByDay = new Array(dim+1).fill(0);
+    waEntries.forEach(e => { const d = Number(e.date.slice(8,10)); if(d>=1&&d<=dim) waByDay[d]+= Number(e.sales)||0; });
+    liveEntries.forEach(e => { const d = Number(e.date.slice(8,10)); if(d>=1&&d<=dim) liveByDay[d]+= Number(e.sales)||0; });
+
+    let cumWa=0, cumLive=0, cumTarget=0;
+    const points = [];
+    let maxVal = 1;
+    for(let d=1; d<=dim; d++){
+      cumWa += waByDay[d];
+      cumLive += liveByDay[d];
+      cumTarget += dailyTarget;
+      const total = cumWa + cumLive;
+      maxVal = Math.max(maxVal, total, cumTarget);
+      points.push({ d, wa: cumWa, live: cumLive, total, target: cumTarget });
+    }
+
+    const W = 1040, H = 260, padL = 46, padB = 26, padT = 10, padR = 10;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const barSlot = plotW / dim;
+    const barW = Math.max(3, barSlot * 0.55);
+
+    function y(v){ return padT + plotH - (v/maxVal)*plotH; }
+    function x(d){ return padL + (d-0.5)*barSlot; }
+
+    let bars = '';
+    points.forEach(p => {
+      const xLeft = padL + (p.d-1)*barSlot + (barSlot-barW)/2;
+      const liveH = (p.live/maxVal)*plotH;
+      const waH = (p.total/maxVal)*plotH - liveH;
+      const liveY = padT + plotH - liveH;
+      const waY = liveY - waH;
+      bars += `<rect x="${xLeft}" y="${waY.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(0,waH).toFixed(1)}" fill="var(--wa)" rx="1.5"></rect>`;
+      bars += `<rect x="${xLeft}" y="${liveY.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(0,liveH).toFixed(1)}" fill="var(--live)" rx="1.5"></rect>`;
+    });
+
+    const targetPath = points.map((p,i) => `${i===0?'M':'L'} ${x(p.d).toFixed(1)} ${y(p.target).toFixed(1)}`).join(' ');
+
+    // x-axis labels: every 5 days
+    let xLabels = '';
+    for(let d=1; d<=dim; d+= (dim>20?5:3)){
+      xLabels += `<text x="${x(d).toFixed(1)}" y="${H-6}" font-size="10" fill="var(--text-muted)" text-anchor="middle">${d}</text>`;
+    }
+    // y-axis gridlines
+    let gridLines = '';
+    const steps = 4;
+    for(let i=0;i<=steps;i++){
+      const val = (maxVal/steps)*i;
+      const yy = y(val);
+      gridLines += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W-padR}" y2="${yy.toFixed(1)}" stroke="var(--line)" stroke-width="1"></line>`;
+      gridLines += `<text x="${padL-8}" y="${(yy+3).toFixed(1)}" font-size="10" fill="var(--text-muted)" text-anchor="end">${Math.round(val/1000)}k</text>`;
+    }
+
+    const svg = `
+      <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" style="overflow:visible;">
+        ${gridLines}
+        ${bars}
+        <path d="${targetPath}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 4"></path>
+        ${xLabels}
+      </svg>`;
+    document.getElementById('climbChart').innerHTML = svg;
+  }
+
+  function renderChannels(mk, monthEntries){
+    const grid = document.getElementById('channelGrid');
+    grid.innerHTML = Object.keys(CHANNELS).map(key => {
+      const meta = CHANNELS[key];
+      const list = monthEntries.filter(e => e.channel===key);
+      const leads = sumField(list,'leads');
+      const buyer = sumField(list,'buyer');
+      const sales = sumField(list,'sales');
+      const cr = leads>0 ? ((buyer/leads)*100).toFixed(1)+'%' : '—';
+      return `
+        <div class="chan-card">
+          <div class="chan-name"><span class="dot" style="background:${meta.color}"></span>${meta.label}</div>
+          <div class="chan-row"><span>Sales</span><b>${fmtRM(sales)}</b></div>
+          <div class="chan-row"><span>Leads</span><b>${fmtNum(leads)}</b></div>
+          <div class="chan-row"><span>Buyer</span><b>${fmtNum(buyer)}</b></div>
+          <div class="chan-row"><span>Closing Rate</span><b>${cr}</b></div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderHistory(){
+    const mk = currentMonth;
+    const filter = document.getElementById('histChannelFilter').value;
+    const list = entriesForMonth(mk, filter).slice().sort((a,b)=> b.date.localeCompare(a.date));
+    const body = document.getElementById('histBody');
+    const empty = document.getElementById('histEmpty');
+    if(list.length===0){
+      body.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    body.innerHTML = list.map(e => {
+      const meta = CHANNELS[e.channel];
+      const chipClass = meta.group==='wa' ? 'chip-wa' : 'chip-live';
+      const cr = e.leads>0 ? ((e.buyer/e.leads)*100).toFixed(1)+'%' : '—';
+      return `
+        <tr>
+          <td>${e.date}</td>
+          <td><span class="chip ${chipClass}"><span class="dot"></span>${meta.label}</span></td>
+          <td>${fmtNum(e.leads)}</td>
+          <td>${fmtNum(e.buyer)}</td>
+          <td>${fmtRM(e.sales)}</td>
+          <td>${cr}</td>
+          <td class="row-actions">
+            <button class="small danger-ghost" data-del="${e.id}">Padam</button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    body.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if(!confirm('Padam entry ni?')) return;
+        entries = entries.filter(e => e.id !== btn.dataset.del);
+        await saveEntries();
+        render();
+      });
+    });
+  }
+
+  // ---------- form ----------
+  document.getElementById('fDate').value = todayStr();
+
+  document.getElementById('btnAdd').addEventListener('click', async () => {
+    const date = document.getElementById('fDate').value;
+    const channel = document.getElementById('fChannel').value;
+    const leads = Number(document.getElementById('fLeads').value)||0;
+    const buyer = Number(document.getElementById('fBuyer').value)||0;
+    const sales = Number(document.getElementById('fSales').value)||0;
+    const msg = document.getElementById('formMsg');
+
+    if(!date){ msg.style.color='var(--danger)'; msg.textContent='Sila pilih tarikh dulu.'; return; }
+    if(sales<=0 && leads<=0 && buyer<=0){ msg.style.color='var(--danger)'; msg.textContent='Isi sekurang-kurangnya satu nilai (leads/buyer/sales).'; return; }
+
+    entries.push({ id: uid(), date, channel, leads, buyer, sales });
+    await saveEntries();
+
+    currentMonth = date.slice(0,7);
+    msg.style.color='var(--wa)';
+    msg.textContent = 'Entry disimpan ✓';
+    document.getElementById('fLeads').value='';
+    document.getElementById('fBuyer').value='';
+    document.getElementById('fSales').value='';
+    setTimeout(()=>{ msg.textContent=''; }, 2500);
+    render();
+  });
+
+  document.getElementById('btnClearForm').addEventListener('click', () => {
+    document.getElementById('fLeads').value='';
+    document.getElementById('fBuyer').value='';
+    document.getElementById('fSales').value='';
+    document.getElementById('formMsg').textContent='';
+  });
+
+  document.getElementById('monthSelect').addEventListener('change', (e) => {
+    currentMonth = e.target.value;
+    render();
+  });
+  document.getElementById('histChannelFilter').addEventListener('change', renderHistory);
+
+  // ---------- settings modal ----------
+  const backdrop = document.getElementById('modalBackdrop');
+  document.getElementById('btnSettings').addEventListener('click', () => {
+    const tgt = getTarget(currentMonth);
+    document.getElementById('modalMonthLabel').textContent = monthLabel(currentMonth);
+    document.getElementById('tgtWa').value = tgt.whatsapp;
+    document.getElementById('tgtLive').value = tgt.live;
+    backdrop.classList.add('open');
+  });
+  document.getElementById('btnCancelSettings').addEventListener('click', () => backdrop.classList.remove('open'));
+  backdrop.addEventListener('click', (e) => { if(e.target===backdrop) backdrop.classList.remove('open'); });
+  document.getElementById('btnSaveSettings').addEventListener('click', async () => {
+    const wa = Number(document.getElementById('tgtWa').value)||0;
+    const live = Number(document.getElementById('tgtLive').value)||0;
+    targets[currentMonth] = { whatsapp: wa, live: live };
+    await saveTargets();
+    backdrop.classList.remove('open');
+    render();
+  });
+
+  // ---------- init ----------
+  (async function init(){
+    await loadData();
+    if(entries.length){
+      currentMonth = entries.slice().sort((a,b)=> b.date.localeCompare(a.date))[0].date.slice(0,7);
+    }
+    populateMonthSelect();
+    render();
+  })();
+})();
+</script>
+</body>
+</html>
