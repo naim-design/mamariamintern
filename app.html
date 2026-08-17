@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/intern-sales.css?v=2">
+  <link rel="stylesheet" href="css/intern-sales.css?v=3">
   <script>
     (function(){const t=localStorage.getItem('internTheme')||'dark';if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
   </script>
@@ -60,6 +60,41 @@
           <article class="metric-card"><span>Sales Live</span><strong id="dash-live-sales">RM0</strong><small id="dash-live-share">0% daripada total</small></article>
           <article class="metric-card"><span>Sales WhatsApp</span><strong id="dash-ws-sales">RM0</strong><small id="dash-ws-meta">0 buyer · 0 leads</small></article>
           <article class="metric-card accent"><span>Forecast Akhir Bulan</span><strong id="dash-forecast">RM0</strong><small id="dash-forecast-gap">Belum cukup data</small></article>
+        </div>
+
+        <div class="performance-grid">
+          <article class="panel performance-panel actual-target-panel">
+            <div class="panel-head"><div><span class="eyebrow">TARGET VS ACTUAL</span><h3>Ringkasan Prestasi Bulan</h3></div><span class="status-chip" id="performance-achievement-chip">0.0%</span></div>
+            <div class="actual-target-values">
+              <div><span>Actual Sales</span><strong id="performance-actual">RM0</strong></div>
+              <div class="target-value"><span>Target Sales</span><strong id="performance-target">RM0</strong></div>
+            </div>
+            <div class="comparison-block">
+              <div class="comparison-label"><span>Achievement</span><b id="performance-achievement">0.0%</b></div>
+              <div class="comparison-track"><span id="performance-achievement-bar" style="width:0%"></span></div>
+            </div>
+            <div class="comparison-block compact">
+              <div class="comparison-label"><span>Pace target sepatutnya hari ini</span><b id="performance-expected">RM0</b></div>
+              <div class="comparison-track expected"><span id="performance-expected-bar" style="width:0%"></span></div>
+            </div>
+            <div class="performance-footer"><span>Baki target <b id="performance-gap">RM0</b></span><small id="performance-gap-caption">Belum ada target.</small></div>
+          </article>
+
+          <article class="panel pace-status-panel">
+            <span class="eyebrow">PACE STATUS</span>
+            <div class="pace-status-badge" id="pace-status-badge">Belum ada target</div>
+            <strong class="pace-status-amount" id="pace-status-amount">RM0</strong>
+            <p id="pace-status-detail">Tetapkan target bulanan untuk mula banding prestasi.</p>
+            <div class="pace-mini-grid">
+              <div><span>Hari berbaki</span><b id="pace-days-left">0</b></div>
+              <div><span>Perlu / hari</span><b id="pace-daily-needed">RM0</b></div>
+            </div>
+          </article>
+
+          <article class="panel ranking-panel">
+            <div class="panel-head"><div><span class="eyebrow">RANKING CHANNEL</span><h3>Sales Tertinggi</h3></div><span class="ranking-month" id="ranking-month-label">—</span></div>
+            <div class="ranking-list" id="channel-ranking-list"></div>
+          </article>
         </div>
 
         <div class="section-title-row"><div><span class="eyebrow">LIVE BREAKDOWN</span><h2>Prestasi ikut channel</h2></div><button class="btn btn-ghost btn-small" data-go="input">+ Input sales</button></div>
@@ -152,6 +187,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="js/firebase-config.js"></script>
-  <script src="js/intern-sales.js?v=2"></script>
+  <script src="js/intern-sales.js?v=3"></script>
 </body>
 </html>
