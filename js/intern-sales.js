@@ -1,4 +1,3 @@
-
 let currentUser=null;
 let currentProfile=null;
 let selectedMonth='';
@@ -143,9 +142,69 @@ function renderDashboard(){
   else if(paceDiff>=0){chip.textContent='On track';chip.className='status-chip success';}
   else{chip.textContent='Perlu push';chip.className='status-chip warning';}
   renderChannel('shopee',s.shopee,t.shopee);renderChannel('mamayuyu',s.mamayuyu,t.mamayuyu);renderChannel('solusi',s.solusi,t.solusi);renderChannel('whatsapp',s.whatsapp,t.whatsapp);
+  renderPerformanceSummary(s,t,{ach,expected,gap,dailyNeed,forecast,paceDiff,remaining,totalDays,elapsed});
   renderRecent();
 }
 function renderChannel(key,actual,target){const p=pct(actual,target);document.getElementById(`${key}-sales`).textContent=money(actual);document.getElementById(`${key}-bar`).style.width=`${clamp(p,0,100)}%`;document.getElementById(`${key}-pct`).textContent=target?`${p.toFixed(1)}%`:'0%';document.getElementById(`${key}-target`).textContent=`Target ${money(target)}`;}
+function renderPerformanceSummary(s,t,m){
+  const hasTarget=t.total>0;
+  const ach=hasTarget?m.ach:0;
+  const expectedPct=hasTarget?pct(m.expected,t.total):0;
+  document.getElementById('performance-actual').textContent=money(s.total);
+  document.getElementById('performance-target').textContent=money(t.total);
+  document.getElementById('performance-achievement').textContent=`${ach.toFixed(1)}%`;
+  document.getElementById('performance-achievement-bar').style.width=`${clamp(ach,0,100)}%`;
+  document.getElementById('performance-expected').textContent=money(m.expected);
+  document.getElementById('performance-expected-bar').style.width=`${clamp(expectedPct,0,100)}%`;
+  const achChip=document.getElementById('performance-achievement-chip');
+  achChip.textContent=hasTarget?`${ach.toFixed(1)}%`:'Belum set';
+  achChip.className='status-chip';
+  if(hasTarget&&s.total>=t.total)achChip.classList.add('success');
+  else if(hasTarget&&m.paceDiff<0)achChip.classList.add('warning');
+  document.getElementById('performance-gap').textContent=money(m.gap);
+  const gapCaption=document.getElementById('performance-gap-caption');
+  if(!hasTarget)gapCaption.textContent='Tetapkan target bulan untuk mula tracking.';
+  else if(s.total>=t.total)gapCaption.textContent=`Lebih target ${money(s.total-t.total)}.`;
+  else gapCaption.textContent=`Masih perlu ${money(m.gap)} untuk capai 100%.`;
+
+  const badge=document.getElementById('pace-status-badge');
+  const amount=document.getElementById('pace-status-amount');
+  const detail=document.getElementById('pace-status-detail');
+  badge.className='pace-status-badge';
+  if(!hasTarget){
+    badge.textContent='BELUM ADA TARGET';
+    amount.textContent=money(0);
+    detail.textContent='Tetapkan target bulanan untuk mula banding prestasi sebenar dengan pace target.';
+  }else if(s.total>=t.total){
+    badge.textContent='TARGET TERCAPAI';badge.classList.add('success');
+    amount.textContent=`+${money(s.total-t.total)}`;
+    detail.textContent='Sales bulan ini sudah melepasi target keseluruhan.';
+  }else if(m.paceDiff>=0){
+    badge.textContent='ON TRACK';badge.classList.add('success');
+    amount.textContent=`+${money(m.paceDiff)}`;
+    detail.textContent=`Mendahului pace target setakat hari ini. Forecast akhir bulan ${money(m.forecast)}.`;
+  }else{
+    badge.textContent='BEHIND TARGET';badge.classList.add('danger');
+    amount.textContent=`-${money(Math.abs(m.paceDiff))}`;
+    detail.textContent=`Ketinggalan daripada pace target setakat hari ini. Perlu purata ${money(m.dailyNeed)} sehari untuk catch up.`;
+  }
+  document.getElementById('pace-days-left').textContent=String(m.remaining);
+  document.getElementById('pace-daily-needed').textContent=money(m.dailyNeed);
+  document.getElementById('ranking-month-label').textContent=monthLabel(selectedMonth);
+
+  const ranking=[
+    {label:'Shopee Live',actual:s.shopee,target:t.shopee},
+    {label:'Mamayuyu',actual:s.mamayuyu,target:t.mamayuyu},
+    {label:'TikTok Solusi',actual:s.solusi,target:t.solusi},
+    {label:'WhatsApp',actual:s.whatsapp,target:t.whatsapp}
+  ].sort((a,b)=>b.actual-a.actual||b.target-a.target||a.label.localeCompare(b.label));
+  const list=document.getElementById('channel-ranking-list');
+  list.innerHTML=ranking.map((r,i)=>{
+    const achievement=r.target?pct(r.actual,r.target):0;
+    const achievementText=r.target?`${achievement.toFixed(1)}% target`:'Tiada target';
+    return `<div class="ranking-row"><div class="ranking-position">${i+1}</div><div class="ranking-copy"><b>${r.label}</b><span>${achievementText}</span></div><div class="ranking-value"><b>${money(r.actual)}</b><span>Target ${money(r.target)}</span></div></div>`;
+  }).join('');
+}
 function renderRecent(){
   const el=document.getElementById('recent-sales-list');const rows=monthSales.slice(0,6);
   if(!rows.length){el.innerHTML='<div class="empty-state">Belum ada sales untuk bulan ini.</div>';return;}
