@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/intern-sales.css?v=4">
+  <link rel="stylesheet" href="css/intern-sales.css?v=5">
   <script>(function(){const t=localStorage.getItem('internTheme')||'dark';if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 </head>
 <body>
@@ -24,9 +24,10 @@
         <button class="nav-btn" data-view="target"><span>◎</span>Target & Komisen</button>
         <button class="nav-btn" data-view="creative"><span>▧</span>Creative Analysis</button>
         <button class="nav-btn" data-view="cod"><span>⌁</span>COD Tracker</button>
+        <button class="nav-btn" data-view="schedule"><span>◷</span>Jadual Live</button>
         <button class="nav-btn" data-view="report"><span>▤</span>Laporan</button>
       </nav>
-      <div class="sidebar-note"><span>TRACKING</span><b>Intern Performance</b><small>WhatsApp · TikTok Live · Shopee · Creative · COD</small></div>
+      <div class="sidebar-note"><span>TRACKING</span><b>Intern Performance</b><small>WhatsApp · TikTok Live · Shopee · Creative · COD · Jadual</small></div>
     </aside>
 
     <header class="topbar">
@@ -147,6 +148,56 @@
         <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">TRACKING</span><h2>Senarai Customer COD</h2></div><span class="status-chip" id="cod-entry-count">0 customer</span></div><div class="table-scroll"><table class="cod-table"><thead><tr><th>Tarikh</th><th>Customer</th><th>Telefon</th><th>Sales</th><th>Tracking</th><th>Delivery</th><th>Bayaran</th><th>Nota</th><th>Tindakan</th></tr></thead><tbody id="cod-body"></tbody></table></div></article>
       </section>
 
+
+      <section id="view-schedule" class="view">
+        <div class="schedule-hero">
+          <article class="panel schedule-summary-card">
+            <div><span class="eyebrow">JADUAL LIVE INTERN LUQMAN</span><h2>Slot Live Mingguan</h2><p>Jadual khas Luqman sahaja. Susunan ini memudahkan semakan platform, hari dan waktu live tanpa bercampur dengan staf lain.</p></div>
+            <div class="schedule-summary-stats"><div><span>Total Slot / Minggu</span><b>6</b></div><div><span>Platform</span><b>3</b></div><div><span>Hari Aktif</span><b>4</b></div></div>
+          </article>
+        </div>
+
+        <div class="schedule-platform-strip">
+          <div class="schedule-platform shopee"><span>S</span><div><b>Shopee HQ</b><small>4 slot / minggu</small></div></div>
+          <div class="schedule-platform mamayuyu"><span>M</span><div><b>TikTok Mamayuyu</b><small>1 slot / minggu</small></div></div>
+          <div class="schedule-platform solusi"><span>T</span><div><b>TikTok Solusi</b><small>1 slot / minggu</small></div></div>
+        </div>
+
+        <div class="weekly-live-grid">
+          <article class="live-day-card">
+            <div class="live-day-head"><div><span>AHAD</span><small>2 slot</small></div></div>
+            <div class="live-slot mamayuyu"><div class="live-time"><b>10:00 AM</b><span>hingga</span><b>11:00 AM</b></div><div class="live-slot-copy"><span class="platform-badge mamayuyu">TikTok Mamayuyu</span><strong>Live Mamayuyu</strong><small>Intern Luqman · Flip Muka</small></div></div>
+            <div class="live-slot shopee"><div class="live-time"><b>3:45 PM</b><span>hingga</span><b>5:15 PM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
+          </article>
+
+          <article class="live-day-card muted-day">
+            <div class="live-day-head"><div><span>ISNIN</span><small>Tiada slot</small></div></div>
+            <div class="live-empty"><span>—</span><p>Tiada jadual live Luqman.</p></div>
+          </article>
+
+          <article class="live-day-card">
+            <div class="live-day-head"><div><span>SELASA</span><small>2 slot</small></div></div>
+            <div class="live-slot solusi"><div class="live-time"><b>7:30 AM</b><span>hingga</span><b>9:00 AM</b></div><div class="live-slot-copy"><span class="platform-badge solusi">TikTok Solusi</span><strong>Live TikTok Solusi</strong><small>Intern Luqman</small></div></div>
+            <div class="live-slot shopee"><div class="live-time"><b>1:00 PM</b><span>hingga</span><b>2:30 PM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
+          </article>
+
+          <article class="live-day-card">
+            <div class="live-day-head"><div><span>RABU</span><small>1 slot</small></div></div>
+            <div class="live-slot shopee"><div class="live-time"><b>10:45 AM</b><span>hingga</span><b>12:15 PM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
+          </article>
+
+          <article class="live-day-card">
+            <div class="live-day-head"><div><span>KHAMIS</span><small>1 slot</small></div></div>
+            <div class="live-slot shopee"><div class="live-time"><b>9:00 AM</b><span>hingga</span><b>10:30 AM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
+          </article>
+        </div>
+
+        <article class="panel schedule-note">
+          <span class="eyebrow">NOTA JADUAL</span>
+          <p>Jadual ini mengambil slot yang ditulis khusus untuk <b>Intern Luqman/Lokman</b> pada jadual Shopee HQ dan TikTok Mamayuyu yang diberikan, ditambah slot TikTok Solusi pada hari Selasa 7:30 AM–9:00 AM.</p>
+        </article>
+      </section>
+
       <section id="view-report" class="view">
         <div class="report-kpis six-kpis"><div><span>Total Sales Dikira</span><b id="report-total">RM0</b></div><div><span>TikTok Live</span><b id="report-tiktok">RM0</b></div><div><span>Shopee Live</span><b id="report-shopee">RM0</b></div><div><span>WhatsApp</span><b id="report-ws">RM0</b></div><div><span>Komisen</span><b id="report-commission">RM0</b></div><div><span>Achievement</span><b id="report-achievement">0%</b></div></div>
         <article class="panel cycle-note"><span class="eyebrow">TIKTOK CYCLE</span><p id="report-cycle-note">Sales TikTok 26hb hingga akhir bulan dibawa ke bulan berikutnya.</p></article>
@@ -161,6 +212,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="js/firebase-config.js"></script>
-  <script src="js/intern-sales.js?v=4"></script>
+  <script src="js/intern-sales.js?v=5"></script>
 </body>
 </html>
