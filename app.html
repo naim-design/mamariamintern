@@ -7,41 +7,32 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/intern-sales.css?v=3">
-  <script>
-    (function(){const t=localStorage.getItem('internTheme')||'dark';if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
-  </script>
+  <link rel="stylesheet" href="css/intern-sales.css?v=4">
+  <script>(function(){const t=localStorage.getItem('internTheme')||'dark';if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 </head>
 <body>
-  <div id="loading-screen" class="loading-screen"><div class="spinner"></div><span>Memuatkan data sales...</span></div>
-
+  <div id="loading-screen" class="loading-screen"><div class="spinner"></div><span>Memuatkan data intern...</span></div>
   <div id="app-shell" class="app-shell" hidden>
     <aside class="sidebar">
       <div class="brand-block">
         <img src="assets/logo-red.png" alt="Mamariam" class="sidebar-logo">
-        <div><b>INTERN SALES</b><span>Forecast & Target</span></div>
+        <div><b>INTERN SALES</b><span>Sales · Creative · COD</span></div>
       </div>
       <nav class="side-nav">
         <button class="nav-btn active" data-view="dashboard"><span>◫</span>Dashboard</button>
         <button class="nav-btn" data-view="input"><span>＋</span>Input Sales</button>
-        <button class="nav-btn" data-view="target"><span>◎</span>Target Bulan</button>
+        <button class="nav-btn" data-view="target"><span>◎</span>Target & Komisen</button>
+        <button class="nav-btn" data-view="creative"><span>▧</span>Creative Analysis</button>
+        <button class="nav-btn" data-view="cod"><span>⌁</span>COD Tracker</button>
         <button class="nav-btn" data-view="report"><span>▤</span>Laporan</button>
       </nav>
-      <div class="sidebar-note">
-        <span>TRACKING</span>
-        <b>Live + WhatsApp</b>
-        <small>Shopee · Mamayuyu · TikTok Solusi</small>
-      </div>
+      <div class="sidebar-note"><span>TRACKING</span><b>Intern Performance</b><small>WhatsApp · TikTok Live · Shopee · Creative · COD</small></div>
     </aside>
 
     <header class="topbar">
-      <div>
-        <div class="mobile-brand">INTERN SALES TRACKER</div>
-        <h1 id="page-title">Dashboard Sales Intern</h1>
-        <p id="page-subtitle">Prestasi sales bulan semasa berbanding target.</p>
-      </div>
+      <div><div class="mobile-brand">INTERN SALES TRACKER</div><h1 id="page-title">Dashboard Sales Intern</h1><p id="page-subtitle">Prestasi sales bulan dipilih berbanding target.</p></div>
       <div class="top-actions">
-        <label class="month-control">Bulan<input type="month" id="global-month"></label>
+        <label class="month-control"><span>Bulan</span><input type="month" id="global-month"></label>
         <button class="icon-btn" id="theme-toggle" title="Tukar tema">🌙</button>
         <div class="user-pill"><div class="user-avatar" id="user-avatar">I</div><div><b id="user-name">Intern</b><span id="user-email">—</span></div></div>
         <button class="btn btn-ghost btn-small" id="logout-btn">Keluar</button>
@@ -53,56 +44,39 @@
         <div class="hero-grid">
           <article class="hero-card target-card">
             <div class="card-top"><span class="card-kicker">TARGET BULANAN</span><span class="status-chip" id="pace-chip">Belum ada target</span></div>
-            <div class="hero-numbers"><div><small>Sales Semasa</small><strong id="dash-total-sales">RM0</strong></div><div class="target-side"><small>Target</small><b id="dash-total-target">RM0</b></div></div>
+            <div class="hero-numbers"><div><small>Sales Dikira</small><strong id="dash-total-sales">RM0</strong></div><div class="target-side"><small>Target</small><b id="dash-total-target">RM0</b></div></div>
             <div class="progress-track"><span id="overall-progress-bar" style="width:0%"></span></div>
             <div class="progress-meta"><span id="overall-progress-text">0.0% dicapai</span><span id="overall-gap-text">Baki RM0</span></div>
           </article>
-          <article class="metric-card"><span>Sales Live</span><strong id="dash-live-sales">RM0</strong><small id="dash-live-share">0% daripada total</small></article>
+          <article class="metric-card"><span>Sales TikTok Live</span><strong id="dash-tiktok-sales">RM0</strong><small id="dash-tiktok-meta">1–25hb + carry-in</small></article>
           <article class="metric-card"><span>Sales WhatsApp</span><strong id="dash-ws-sales">RM0</strong><small id="dash-ws-meta">0 buyer · 0 leads</small></article>
-          <article class="metric-card accent"><span>Forecast Akhir Bulan</span><strong id="dash-forecast">RM0</strong><small id="dash-forecast-gap">Belum cukup data</small></article>
+          <article class="metric-card accent"><span>Anggaran Komisen</span><strong id="dash-commission">RM0</strong><small id="dash-commission-meta">4% sales yang layak</small></article>
+        </div>
+
+        <div class="commission-summary-grid">
+          <article class="compact-stat"><span>WhatsApp</span><b id="sum-ws-sales">RM0</b><small>Komisen <strong id="sum-ws-commission">RM0</strong></small></article>
+          <article class="compact-stat"><span>TikTok Live</span><b id="sum-tiktok-sales">RM0</b><small>Komisen <strong id="sum-tiktok-commission">RM0</strong></small></article>
+          <article class="compact-stat"><span>Shopee Live</span><b id="sum-shopee-sales">RM0</b><small>Komisen <strong id="sum-shopee-commission">RM0</strong></small></article>
+          <article class="compact-stat carry"><span>Carry Forward 26hb+</span><b id="sum-carry-sales">RM0</b><small id="sum-carry-meta">Masuk bulan depan · tiada komisen</small></article>
         </div>
 
         <div class="performance-grid">
           <article class="panel performance-panel actual-target-panel">
             <div class="panel-head"><div><span class="eyebrow">TARGET VS ACTUAL</span><h3>Ringkasan Prestasi Bulan</h3></div><span class="status-chip" id="performance-achievement-chip">0.0%</span></div>
-            <div class="actual-target-values">
-              <div><span>Actual Sales</span><strong id="performance-actual">RM0</strong></div>
-              <div class="target-value"><span>Target Sales</span><strong id="performance-target">RM0</strong></div>
-            </div>
-            <div class="comparison-block">
-              <div class="comparison-label"><span>Achievement</span><b id="performance-achievement">0.0%</b></div>
-              <div class="comparison-track"><span id="performance-achievement-bar" style="width:0%"></span></div>
-            </div>
-            <div class="comparison-block compact">
-              <div class="comparison-label"><span>Pace target sepatutnya hari ini</span><b id="performance-expected">RM0</b></div>
-              <div class="comparison-track expected"><span id="performance-expected-bar" style="width:0%"></span></div>
-            </div>
+            <div class="actual-target-values"><div><span>Actual Sales Dikira</span><strong id="performance-actual">RM0</strong></div><div class="target-value"><span>Target Sales</span><strong id="performance-target">RM0</strong></div></div>
+            <div class="comparison-block"><div class="comparison-label"><span>Achievement</span><b id="performance-achievement">0.0%</b></div><div class="comparison-track"><span id="performance-achievement-bar" style="width:0%"></span></div></div>
+            <div class="comparison-block compact"><div class="comparison-label"><span>Pace target sepatutnya hari ini</span><b id="performance-expected">RM0</b></div><div class="comparison-track expected"><span id="performance-expected-bar" style="width:0%"></span></div></div>
             <div class="performance-footer"><span>Baki target <b id="performance-gap">RM0</b></span><small id="performance-gap-caption">Belum ada target.</small></div>
           </article>
-
-          <article class="panel pace-status-panel">
-            <span class="eyebrow">PACE STATUS</span>
-            <div class="pace-status-badge" id="pace-status-badge">Belum ada target</div>
-            <strong class="pace-status-amount" id="pace-status-amount">RM0</strong>
-            <p id="pace-status-detail">Tetapkan target bulanan untuk mula banding prestasi.</p>
-            <div class="pace-mini-grid">
-              <div><span>Hari berbaki</span><b id="pace-days-left">0</b></div>
-              <div><span>Perlu / hari</span><b id="pace-daily-needed">RM0</b></div>
-            </div>
-          </article>
-
-          <article class="panel ranking-panel">
-            <div class="panel-head"><div><span class="eyebrow">RANKING CHANNEL</span><h3>Sales Tertinggi</h3></div><span class="ranking-month" id="ranking-month-label">—</span></div>
-            <div class="ranking-list" id="channel-ranking-list"></div>
-          </article>
+          <article class="panel pace-status-panel"><span class="eyebrow">PACE STATUS</span><div class="pace-status-badge" id="pace-status-badge">Belum ada target</div><strong class="pace-status-amount" id="pace-status-amount">RM0</strong><p id="pace-status-detail">Tetapkan target bulanan untuk mula banding prestasi.</p><div class="pace-mini-grid"><div><span>Hari berbaki</span><b id="pace-days-left">0</b></div><div><span>Perlu / hari</span><b id="pace-daily-needed">RM0</b></div></div></article>
+          <article class="panel ranking-panel"><div class="panel-head"><div><span class="eyebrow">RANKING CHANNEL</span><h3>Sales Tertinggi</h3></div><span class="ranking-month" id="ranking-month-label">—</span></div><div class="ranking-list" id="channel-ranking-list"></div></article>
         </div>
 
-        <div class="section-title-row"><div><span class="eyebrow">LIVE BREAKDOWN</span><h2>Prestasi ikut channel</h2></div><button class="btn btn-ghost btn-small" data-go="input">+ Input sales</button></div>
-        <div class="channel-grid">
-          <article class="channel-card" data-channel="shopee"><div class="channel-head"><span class="channel-icon">S</span><div><b>Shopee Live</b><small>Sales Live</small></div></div><strong id="shopee-sales">RM0</strong><div class="mini-progress"><span id="shopee-bar"></span></div><div class="channel-meta"><span id="shopee-pct">0%</span><span id="shopee-target">Target RM0</span></div></article>
-          <article class="channel-card" data-channel="mamayuyu"><div class="channel-head"><span class="channel-icon">M</span><div><b>Mamayuyu</b><small>Sales Live</small></div></div><strong id="mamayuyu-sales">RM0</strong><div class="mini-progress"><span id="mamayuyu-bar"></span></div><div class="channel-meta"><span id="mamayuyu-pct">0%</span><span id="mamayuyu-target">Target RM0</span></div></article>
-          <article class="channel-card" data-channel="solusi"><div class="channel-head"><span class="channel-icon">T</span><div><b>TikTok Solusi</b><small>Sales Live</small></div></div><strong id="solusi-sales">RM0</strong><div class="mini-progress"><span id="solusi-bar"></span></div><div class="channel-meta"><span id="solusi-pct">0%</span><span id="solusi-target">Target RM0</span></div></article>
-          <article class="channel-card" data-channel="whatsapp"><div class="channel-head"><span class="channel-icon">W</span><div><b>WhatsApp</b><small>Closing / Follow-up</small></div></div><strong id="whatsapp-sales">RM0</strong><div class="mini-progress"><span id="whatsapp-bar"></span></div><div class="channel-meta"><span id="whatsapp-pct">0%</span><span id="whatsapp-target">Target RM0</span></div></article>
+        <div class="section-title-row"><div><span class="eyebrow">CHANNEL BREAKDOWN</span><h2>Prestasi ikut channel</h2></div><button class="btn btn-ghost btn-small" data-go="input">+ Input sales</button></div>
+        <div class="channel-grid channel-grid-three">
+          <article class="channel-card" data-channel="shopee"><div class="channel-head"><span class="channel-icon">S</span><div><b>Shopee Live</b><small>Tiada cutoff</small></div></div><strong id="shopee-sales">RM0</strong><div class="mini-progress"><span id="shopee-bar"></span></div><div class="channel-meta"><span id="shopee-pct">0%</span><span id="shopee-target">Target RM0</span></div></article>
+          <article class="channel-card" data-channel="tiktok"><div class="channel-head"><span class="channel-icon">T</span><div><b>TikTok Live</b><small>Solusi + Mamayuyu · cutoff 25hb</small></div></div><strong id="tiktok-sales">RM0</strong><div class="mini-progress"><span id="tiktok-bar"></span></div><div class="channel-meta"><span id="tiktok-pct">0%</span><span id="tiktok-target">Target RM0</span></div></article>
+          <article class="channel-card" data-channel="whatsapp"><div class="channel-head"><span class="channel-icon">W</span><div><b>WhatsApp</b><small>Tiada cutoff</small></div></div><strong id="whatsapp-sales">RM0</strong><div class="mini-progress"><span id="whatsapp-bar"></span></div><div class="channel-meta"><span id="whatsapp-pct">0%</span><span id="whatsapp-target">Target RM0</span></div></article>
         </div>
 
         <div class="insight-grid">
@@ -112,73 +86,73 @@
           <article class="info-card"><span>Beza vs pace target</span><strong id="pace-difference">RM0</strong><small id="pace-difference-meta">Belum ada target</small></article>
         </div>
 
-        <div class="charts-grid">
-          <article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">TREND</span><h3>Cumulative Sales vs Target</h3></div></div><div class="chart-wrap"><canvas id="trend-chart"></canvas></div></article>
-          <article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">SALES MIX</span><h3>Sumbangan Channel</h3></div></div><div class="chart-wrap small"><canvas id="mix-chart"></canvas></div></article>
-        </div>
-
-        <article class="panel recent-panel"><div class="panel-head"><div><span class="eyebrow">TERKINI</span><h3>Sales terbaru bulan ini</h3></div><button class="text-btn" data-go="report">Lihat semua</button></div><div id="recent-sales-list" class="recent-list"></div></article>
+        <div class="charts-grid"><article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">TREND</span><h3>Cumulative Sales vs Target</h3></div></div><div class="chart-wrap"><canvas id="trend-chart"></canvas></div></article><article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">SALES MIX</span><h3>Sumbangan Channel</h3></div></div><div class="chart-wrap small"><canvas id="mix-chart"></canvas></div></article></div>
+        <article class="panel recent-panel"><div class="panel-head"><div><span class="eyebrow">TERKINI</span><h3>Sales dalam cycle bulan ini</h3></div><button class="text-btn" data-go="report">Lihat semua</button></div><div id="recent-sales-list" class="recent-list"></div></article>
       </section>
 
       <section id="view-input" class="view">
         <div class="page-grid form-page-grid">
-          <article class="panel form-panel">
-            <div class="panel-head"><div><span class="eyebrow">INPUT HARIAN</span><h2 id="sales-form-title">Rekod Sales Baru</h2></div><span class="status-chip">Live / WhatsApp</span></div>
-            <form id="sales-form">
-              <div class="form-grid two">
-                <label>Tarikh<input type="date" id="sale-date" required></label>
-                <label>Sumber Sales<select id="sale-source"><option value="live">Live</option><option value="whatsapp">WhatsApp</option></select></label>
-              </div>
-              <div id="live-fields" class="form-grid two block-gap">
-                <label>Platform Live<select id="sale-platform"><option value="shopee">Shopee</option><option value="mamayuyu">Mamayuyu</option><option value="solusi">TikTok Solusi</option></select></label>
-                <label>Masa Live (jam)<input type="number" id="sale-live-hours" min="0" step="0.25" placeholder="cth: 2.5"></label>
-              </div>
-              <div id="whatsapp-fields" class="form-grid two block-gap" hidden>
-                <label>Leads / Prospek<input type="number" id="sale-leads" min="0" step="1" value="0"></label>
-                <label>Buyer<input type="number" id="sale-buyers" min="0" step="1" value="0"></label>
-              </div>
+          <article class="panel form-panel"><div class="panel-head"><div><span class="eyebrow">INPUT HARIAN</span><h2 id="sales-form-title">Rekod Sales Baru</h2></div><span class="status-chip">Live / WhatsApp</span></div>
+            <form id="sales-form"><div class="form-grid two"><label>Tarikh<input type="date" id="sale-date" required></label><label>Sumber Sales<select id="sale-source"><option value="live">Live</option><option value="whatsapp">WhatsApp</option></select></label></div>
+              <div id="live-fields" class="form-grid two block-gap"><label>Platform Live<select id="sale-platform"><option value="shopee">Shopee</option><option value="mamayuyu">TikTok Mamayuyu</option><option value="solusi">TikTok Solusi</option></select></label><label>Masa Live (jam)<input type="number" id="sale-live-hours" min="0" step="0.25" placeholder="cth: 2.5"></label></div>
+              <div id="whatsapp-fields" class="form-grid two block-gap" hidden><label>Leads / Prospek<input type="number" id="sale-leads" min="0" step="1" value="0"></label><label>Buyer<input type="number" id="sale-buyers" min="0" step="1" value="0"></label></div>
               <div class="form-grid block-gap"><label>Jumlah Sales (RM)<input class="money-input" type="number" id="sale-amount" min="0" step="0.01" required placeholder="0.00"></label></div>
               <div class="form-grid block-gap"><label>Nota (optional)<textarea id="sale-note" rows="3" placeholder="cth: Live 8pm–10pm / follow up database lama"></textarea></label></div>
               <div class="form-actions"><button class="btn btn-primary" id="sales-submit" type="submit">Simpan Sales</button><button class="btn btn-ghost" id="cancel-edit" type="button" hidden>Batal Edit</button></div>
             </form>
           </article>
-          <aside class="panel input-preview">
-            <span class="eyebrow">PREVIEW</span><h3>Entri yang akan disimpan</h3>
-            <div class="preview-amount" id="preview-amount">RM0.00</div>
-            <div class="preview-line"><span>Sumber</span><b id="preview-source">Live · Shopee</b></div>
-            <div class="preview-line"><span>Tarikh</span><b id="preview-date">—</b></div>
-            <div class="preview-line"><span>Detail</span><b id="preview-detail">0 jam</b></div>
-            <div class="helper-box"><b>Tip</b><span>Masukkan sales setiap hari supaya forecast dan pace target sentiasa tepat.</span></div>
-          </aside>
+          <aside class="panel input-preview"><span class="eyebrow">PREVIEW</span><h3>Entri yang akan disimpan</h3><div class="preview-amount" id="preview-amount">RM0.00</div><div class="preview-line"><span>Sumber</span><b id="preview-source">Live · Shopee</b></div><div class="preview-line"><span>Tarikh</span><b id="preview-date">—</b></div><div class="preview-line"><span>Detail</span><b id="preview-detail">0 jam</b></div><div class="helper-box" id="input-cutoff-note"><b>Cutoff TikTok</b><span>Sales TikTok 26hb hingga akhir bulan akan dibawa ke cycle bulan depan dan tidak dikira komisen.</span></div></aside>
         </div>
-        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">BULAN DIPILIH</span><h3>Entri Sales</h3></div><span class="status-chip" id="input-entry-count">0 entri</span></div><div class="table-scroll"><table><thead><tr><th>Tarikh</th><th>Sumber</th><th>Detail</th><th>Sales</th><th>Buyer</th><th>Tindakan</th></tr></thead><tbody id="input-sales-body"></tbody></table></div></article>
+        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">TARIKH KALENDAR BULAN DIPILIH</span><h3>Entri Sales</h3></div><span class="status-chip" id="input-entry-count">0 entri</span></div><div class="table-scroll"><table><thead><tr><th>Tarikh</th><th>Sumber</th><th>Detail</th><th>Sales</th><th>Buyer</th><th>Cycle</th><th>Tindakan</th></tr></thead><tbody id="input-sales-body"></tbody></table></div></article>
       </section>
 
       <section id="view-target" class="view">
         <article class="panel target-form-panel">
-          <div class="panel-head"><div><span class="eyebrow">TARGET BULANAN</span><h2>Set Target Sales</h2><p>Target keseluruhan dikira automatik daripada 4 channel di bawah.</p></div><div class="big-target" id="target-total-preview">RM0</div></div>
+          <div class="panel-head"><div><span class="eyebrow">TARGET FLEKSIBEL BULANAN</span><h2>Set Target & Komisen</h2><p>Target boleh diubah setiap bulan mengikut performance. TikTok mempunyai cutoff 25hb.</p></div><div class="big-target" id="target-total-preview">RM0</div></div>
           <form id="target-form">
-            <div class="target-input-grid">
-              <label><span>WhatsApp</span><input type="number" id="target-whatsapp" min="0" step="1" value="0"></label>
-              <label><span>Shopee Live</span><input type="number" id="target-shopee" min="0" step="1" value="0"></label>
-              <label><span>Mamayuyu</span><input type="number" id="target-mamayuyu" min="0" step="1" value="0"></label>
-              <label><span>TikTok Solusi</span><input type="number" id="target-solusi" min="0" step="1" value="0"></label>
-            </div>
-            <div class="target-summary-strip"><div><span>Target Live</span><b id="target-live-preview">RM0</b></div><div><span>Target WhatsApp</span><b id="target-ws-preview">RM0</b></div><div><span>Target Keseluruhan</span><b id="target-grand-preview">RM0</b></div><div><span>Purata diperlukan / hari</span><b id="target-daily-preview">RM0</b></div></div>
+            <div class="target-block"><div class="target-block-head"><div><b>WhatsApp</b><span>Tiada cutoff · 3 checkpoint</span></div><strong id="target-ws-preview">RM0</strong></div><div class="target-input-grid target-three"><label><span>1–10hb</span><input type="number" id="target-ws-1" min="0" step="1" value="1000"></label><label><span>11–20hb</span><input type="number" id="target-ws-2" min="0" step="1" value="1000"></label><label><span>21–Akhir Bulan</span><input type="number" id="target-ws-3" min="0" step="1" value="1000"></label></div></div>
+            <div class="target-block"><div class="target-block-head"><div><b>TikTok Live</b><span>Solusi + Mamayuyu · sales 1–25hb dikira bulan ini</span></div><strong id="target-tiktok-preview">RM0</strong></div><div class="target-input-grid"><label><span>1–8hb</span><input type="number" id="target-tt-1" min="0" step="1" value="1000"></label><label><span>9–16hb</span><input type="number" id="target-tt-2" min="0" step="1" value="1000"></label><label><span>17–25hb</span><input type="number" id="target-tt-3" min="0" step="1" value="1000"></label><label class="carry-target"><span>26–Akhir · Carry Forward</span><input type="number" id="target-tt-carry" min="0" step="1" value="1000"></label></div></div>
+            <div class="target-block"><div class="target-block-head"><div><b>Shopee Live</b><span>Tiada cutoff · target sebulan</span></div><strong id="target-shopee-preview">RM0</strong></div><div class="target-input-grid target-two"><label><span>Target Sebulan</span><input type="number" id="target-shopee" min="0" step="1" value="2000"></label><label><span>Kadar Komisen (%)</span><input type="number" id="commission-rate" min="0" max="100" step="0.1" value="4"></label></div></div>
+            <div class="target-summary-strip target-summary-five"><div><span>Target WhatsApp</span><b id="target-ws-total-preview">RM0</b></div><div><span>Target TikTok 1–25</span><b id="target-tt-total-preview">RM0</b></div><div><span>Target Shopee</span><b id="target-shopee-total-preview">RM0</b></div><div><span>Target Dikira Bulan Ini</span><b id="target-grand-preview">RM0</b></div><div><span>Target Carry 26hb+</span><b id="target-carry-preview">RM0</b></div></div>
             <div class="form-actions"><button class="btn btn-primary" type="submit">Simpan Target Bulan Ini</button></div>
           </form>
         </article>
-        <article class="panel milestone-panel"><div class="panel-head"><div><span class="eyebrow">PACE CHECK</span><h3>Checkpoint Bulan</h3></div></div><div class="milestone-grid" id="milestone-grid"></div></article>
+        <article class="panel milestone-panel"><div class="panel-head"><div><span class="eyebrow">CHECKPOINT PERFORMANCE</span><h3>Progress Mengikut Tempoh</h3><p>Hijau = capai / melebihi target. Merah = masih belum capai.</p></div></div><div class="segment-progress-grid" id="target-progress-grid"></div></article>
+      </section>
+
+      <section id="view-creative" class="view">
+        <div class="creative-kpis report-kpis six-kpis"><div><span>Total Poster</span><b id="creative-total-posters">0</b></div><div><span>Poster Active</span><b id="creative-active-posters">0</b></div><div><span>Total Leads</span><b id="creative-total-leads">0</b></div><div><span>Total Buyer</span><b id="creative-total-buyers">0</b></div><div><span>Top Poster</span><b class="small-kpi" id="creative-top-poster">—</b></div><div><span>Top Creative Type</span><b class="small-kpi" id="creative-top-type">—</b></div></div>
+        <div class="creative-form-grid">
+          <article class="panel form-panel"><div class="panel-head"><div><span class="eyebrow">POSTER MASTER</span><h2>Tambah Poster / Creative</h2><p>Upload screenshot sekali. Selepas itu rekod performance harian pada poster yang sama.</p></div></div>
+            <form id="poster-form"><div class="form-grid two"><label>Nama / Kod Poster<input id="poster-name" required placeholder="cth: MERDEKA 40% - Hook HB Low"></label><label>Jenis Creative<select id="poster-type"><option value="promo">Promo</option><option value="masalah">Masalah</option><option value="problem_aware">Problem Aware</option><option value="unaware">Unaware</option><option value="solusi">Solusi</option></select></label></div><div class="form-grid two block-gap"><label>Status<select id="poster-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label><label>Screenshot Poster<input type="file" id="poster-image" accept="image/*" required></label></div><div class="poster-upload-preview" id="poster-upload-preview"><span>Preview screenshot akan keluar di sini</span></div><div class="form-grid block-gap"><label>Nota<textarea id="poster-note" rows="2" placeholder="Angle, headline, audience atau remark marketer"></textarea></label></div><div class="form-actions"><button class="btn btn-primary" type="submit">Simpan Poster</button></div></form>
+          </article>
+          <article class="panel form-panel"><div class="panel-head"><div><span class="eyebrow">PERFORMANCE HARIAN</span><h2>Rekod Leads By Day</h2><p>Pilih poster yang sama dan masukkan result hari tersebut.</p></div></div>
+            <form id="creative-daily-form"><div class="form-grid two"><label>Tarikh<input type="date" id="creative-date" required></label><label>Poster<select id="creative-poster-id" required></select></label></div><div class="form-grid two block-gap"><label>Leads Masuk<input type="number" id="creative-leads" min="0" step="1" value="0" required></label><label>Buyer / Closing<input type="number" id="creative-buyers" min="0" step="1" value="0"></label></div><div class="form-grid block-gap"><label>Sales dari poster (optional)<input type="number" id="creative-sales" min="0" step="0.01" value="0"></label></div><div class="form-grid block-gap"><label>Nota<textarea id="creative-daily-note" rows="2" placeholder="cth: Leads banyak tapi low quality / marketer off petang"></textarea></label></div><div class="form-actions"><button class="btn btn-primary" type="submit">Simpan Performance</button></div></form>
+          </article>
+        </div>
+        <div class="charts-grid creative-charts"><article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">POSTER RANKING</span><h3>Leads Mengikut Poster</h3></div></div><div class="chart-wrap"><canvas id="creative-poster-chart"></canvas></div></article><article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">CREATIVE TYPE</span><h3>Leads Mengikut Jenis</h3></div></div><div class="chart-wrap small"><canvas id="creative-type-chart"></canvas></div></article></div>
+        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">ANALYSIS</span><h2>Poster Performance</h2></div><span class="status-chip" id="creative-ranking-count">0 poster</span></div><div class="table-scroll"><table class="creative-table"><thead><tr><th>Poster</th><th>Jenis</th><th>Status</th><th>Leads</th><th>Buyer</th><th>Sales</th><th>Avg Leads/Hari</th><th>Last Update</th><th>Tindakan</th></tr></thead><tbody id="creative-ranking-body"></tbody></table></div></article>
+        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">BY DAY</span><h3>Rekod Performance Harian</h3></div></div><div class="table-scroll"><table><thead><tr><th>Tarikh</th><th>Poster</th><th>Leads</th><th>Buyer</th><th>Sales</th><th>Nota</th><th>Tindakan</th></tr></thead><tbody id="creative-daily-body"></tbody></table></div></article>
+      </section>
+
+      <section id="view-cod" class="view">
+        <div class="report-kpis six-kpis"><div><span>COD Sales</span><b id="cod-total-sales">RM0</b></div><div><span>Customer COD</span><b id="cod-total-customers">0</b></div><div><span>Delivered</span><b id="cod-delivered">0</b></div><div><span>Pending Delivery</span><b id="cod-pending-delivery">0</b></div><div><span>Paid</span><b id="cod-paid">0</b></div><div class="risk-kpi"><span>Perlu Follow Up</span><b id="cod-risk">0</b></div></div>
+        <div class="page-grid form-page-grid">
+          <article class="panel form-panel"><div class="panel-head"><div><span class="eyebrow">COD CUSTOMER</span><h2>Tambah Rekod COD</h2><p>Masukkan satu rekod untuk setiap customer supaya nombor telefon dan tracking boleh difollow up.</p></div></div>
+            <form id="cod-form"><div class="form-grid two"><label>Tarikh Order<input type="date" id="cod-date" required></label><label>Nama Customer<input id="cod-name" placeholder="Optional"></label></div><div class="form-grid two block-gap"><label>No. Telefon<input id="cod-phone" required placeholder="cth: 0123456789"></label><label>Jumlah Sales (RM)<input type="number" id="cod-sales" min="0" step="0.01" required></label></div><div class="form-grid two block-gap"><label>No. Tracking<input id="cod-tracking" placeholder="Masukkan bila dah dapat tracking"></label><label>Courier<input id="cod-courier" placeholder="cth: J&T / Ninja Van"></label></div><div class="form-grid two block-gap"><label>Status Penghantaran<select id="cod-delivery-status"><option value="order">Order Baru</option><option value="shipped">Shipped</option><option value="out_delivery">Out for Delivery</option><option value="delivered">Delivered</option><option value="failed">Delivery Failed</option><option value="return">Return / Reject</option></select></label><label>Status Bayaran<select id="cod-payment-status"><option value="pending">Pending</option><option value="paid">Paid</option><option value="failed">Tak Bayar / Failed</option></select></label></div><div class="form-grid block-gap"><label>Nota Follow Up<textarea id="cod-note" rows="2" placeholder="cth: WhatsApp customer pagi esok untuk pastikan ada orang di rumah"></textarea></label></div><div class="form-actions"><button class="btn btn-primary" id="cod-submit" type="submit">Simpan COD</button><button class="btn btn-ghost" id="cod-cancel-edit" type="button" hidden>Batal Edit</button></div></form>
+          </article>
+          <aside class="panel input-preview"><span class="eyebrow">FOLLOW-UP GUIDE</span><h3>COD yang perlu perhatian</h3><div class="helper-box warning-box"><b>Prioriti</b><span>Order yang sudah Out for Delivery / Delivered tetapi bayaran masih Pending akan ditanda merah untuk follow up cepat.</span></div><div class="helper-box"><b>WhatsApp</b><span>Dalam jadual, tekan butang Chat untuk terus buka nombor customer.</span></div><div class="helper-box"><b>Nota</b><span>COD sales tidak ditambah semula ke Dashboard Sales bagi mengelakkan double count jika order itu sudah direkod sebagai sales WhatsApp/Live.</span></div></aside>
+        </div>
+        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">RINGKASAN HARIAN</span><h3>COD By Day</h3></div></div><div class="daily-summary-grid" id="cod-daily-summary"></div></article>
+        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">TRACKING</span><h2>Senarai Customer COD</h2></div><span class="status-chip" id="cod-entry-count">0 customer</span></div><div class="table-scroll"><table class="cod-table"><thead><tr><th>Tarikh</th><th>Customer</th><th>Telefon</th><th>Sales</th><th>Tracking</th><th>Delivery</th><th>Bayaran</th><th>Nota</th><th>Tindakan</th></tr></thead><tbody id="cod-body"></tbody></table></div></article>
       </section>
 
       <section id="view-report" class="view">
-        <div class="report-kpis">
-          <div><span>Total Sales</span><b id="report-total">RM0</b></div><div><span>Live</span><b id="report-live">RM0</b></div><div><span>WhatsApp</span><b id="report-ws">RM0</b></div><div><span>Achievement</span><b id="report-achievement">0%</b></div>
-        </div>
-        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">DETAIL SALES</span><h2>Laporan Bulanan</h2></div><button class="btn btn-ghost btn-small" id="export-csv">Export CSV</button></div><div class="table-scroll"><table><thead><tr><th>Tarikh</th><th>Jenis</th><th>Platform</th><th>Sales</th><th>Leads</th><th>Buyer</th><th>Masa Live</th><th>Nota</th></tr></thead><tbody id="report-sales-body"></tbody></table></div></article>
+        <div class="report-kpis six-kpis"><div><span>Total Sales Dikira</span><b id="report-total">RM0</b></div><div><span>TikTok Live</span><b id="report-tiktok">RM0</b></div><div><span>Shopee Live</span><b id="report-shopee">RM0</b></div><div><span>WhatsApp</span><b id="report-ws">RM0</b></div><div><span>Komisen</span><b id="report-commission">RM0</b></div><div><span>Achievement</span><b id="report-achievement">0%</b></div></div>
+        <article class="panel cycle-note"><span class="eyebrow">TIKTOK CYCLE</span><p id="report-cycle-note">Sales TikTok 26hb hingga akhir bulan dibawa ke bulan berikutnya.</p></article>
+        <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">DETAIL SALES</span><h2>Laporan Bulanan</h2></div><button class="btn btn-ghost btn-small" id="export-csv">Export CSV</button></div><div class="table-scroll"><table><thead><tr><th>Tarikh Asal</th><th>Jenis</th><th>Platform</th><th>Sales</th><th>Leads</th><th>Buyer</th><th>Masa Live</th><th>Cycle</th><th>Komisen</th><th>Nota</th></tr></thead><tbody id="report-sales-body"></tbody></table></div></article>
       </section>
     </main>
-
     <div class="toast" id="toast"></div>
   </div>
 
@@ -187,6 +161,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="js/firebase-config.js"></script>
-  <script src="js/intern-sales.js?v=3"></script>
+  <script src="js/intern-sales.js?v=4"></script>
 </body>
 </html>
