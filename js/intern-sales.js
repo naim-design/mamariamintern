@@ -58,10 +58,11 @@ function setupInternAdminFilter(entries, currentUser) {
   if (!select.dataset.bound) {
     select.addEventListener("change", () => {
       internSelectedUid = select.value;
-      if (typeof refreshAll === "function") refreshAll();
+      if (typeof applyAdminViewerFilter === "function") applyAdminViewerFilter();
+      if (typeof renderEverything === "function") renderEverything();
+      else if (typeof refreshAll === "function") refreshAll();
       else if (typeof renderAll === "function") renderAll();
       else if (typeof renderDashboard === "function") renderDashboard();
-      else window.location.reload();
     });
     select.dataset.bound = "1";
   }
@@ -77,6 +78,26 @@ function filterEntriesForViewer(entries, currentUser) {
   return list.filter(e => getInternEntryUid(e) === uid);
 }
 /* ===== END ADMIN PATCH ===== */
+
+
+/* ===== V5.4 ADMIN RAW DATA CACHE ===== */
+let rawAllSales = [];
+let rawAllPosters = [];
+let rawCreativeDaily = [];
+let rawCodEntries = [];
+
+function applyAdminViewerFilter(){
+  try{
+    allSales = filterEntriesForViewer(rawAllSales, currentUser);
+    allPosters = filterEntriesForViewer(rawAllPosters, currentUser);
+    creativeDaily = filterEntriesForViewer(rawCreativeDaily, currentUser);
+    codEntries = filterEntriesForViewer(rawCodEntries, currentUser);
+
+    calendarMonthSales = allSales.filter(e=>entryMonth(e)===selectedMonth).sort(sortEntries);
+    monthSales = allSales.filter(e=>accountingMonthForEntry(e)===selectedMonth).sort(sortEntries);
+  }catch(e){ console.warn("applyAdminViewerFilter",e); }
+}
+/* ===== END V5.4 ADMIN RAW DATA CACHE ===== */
 
 let currentUser=null;
 let currentProfile=null;
@@ -150,11 +171,14 @@ async function refreshAll(){
       const source = (typeof entries !== "undefined" && Array.isArray(entries)) ? entries :
                      (typeof allEntries !== "undefined" && Array.isArray(allEntries)) ? allEntries :
                      (typeof salesEntries !== "undefined" && Array.isArray(salesEntries)) ? salesEntries : [];
-      setupInternAdminFilter(source, typeof currentUser !== "undefined" ? currentUser : null);
+      setupInternAdminFilter(
+      (typeof rawAllSales !== "undefined" && Array.isArray(rawAllSales) && rawAllSales.length) ? rawAllSales : source,
+      typeof currentUser !== "undefined" ? currentUser : null
+    );
     } catch (e) { console.warn("Admin filter init:", e); }
   }, 0);
 await Promise.all([loadSales(),loadTarget(),loadCreative(),loadCod()]);renderEverything();}
-async function loadSales(){try{const snap=await db.collection('entries').where('kind','==','intern_sales').get();allSales=snap.docs.map(d=>({id:d.id,...d.data()})).filter(e=>e.staffUid===currentUser.uid);}catch(err){console.error(err);toast('Tak dapat baca data sales. Semak Firestore Rules.','error');allSales=[];}calendarMonthSales=allSales.filter(e=>entryMonth(e)===selectedMonth).sort(sortEntries);monthSales=allSales.filter(e=>accountingMonthForEntry(e)===selectedMonth).sort(sortEntries);}
+async function loadSales(){try{const snap=await db.collection('entries').where('kind','==','intern_sales').get();rawAllSales=snap.docs.map(d=>({id:d.id,...d.data()}));allSales=filterEntriesForViewer(rawAllSales,currentUser);}catch(err){console.error(err);toast('Tak dapat baca data sales. Semak Firestore Rules.','error');allSales=[];}calendarMonthSales=allSales.filter(e=>entryMonth(e)===selectedMonth).sort(sortEntries);monthSales=allSales.filter(e=>accountingMonthForEntry(e)===selectedMonth).sort(sortEntries);}
 function sortEntries(a,b){return(b.date||'').localeCompare(a.date||'')||((b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));}
 function targetDocId(){return `intern_target_${currentUser.uid}_${selectedMonth}`;}
 async function loadTarget(){
@@ -175,8 +199,8 @@ async function loadTarget(){
   }catch(err){console.error(err);currentTarget=calcTarget(blankTarget());}
   setTargetInputs();updateTargetPreview();
 }
-async function loadCreative(){try{const [pSnap,dSnap]=await Promise.all([db.collection('posters').where('kind','==','intern_creative').get(),db.collection('entries').where('kind','==','intern_creative_daily').get()]);allPosters=pSnap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.staffUid===currentUser.uid);creativeDaily=dSnap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.staffUid===currentUser.uid);}catch(err){console.error(err);allPosters=[];creativeDaily=[];}}
-async function loadCod(){try{const snap=await db.collection('entries').where('kind','==','intern_cod').get();codEntries=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.staffUid===currentUser.uid);}catch(err){console.error(err);codEntries=[];}}
+async function loadCreative(){try{const [pSnap,dSnap]=await Promise.all([db.collection('posters').where('kind','==','intern_creative').get(),db.collection('entries').where('kind','==','intern_creative_daily').get()]);rawAllPosters=pSnap.docs.map(d=>({id:d.id,...d.data()}));allPosters=filterEntriesForViewer(rawAllPosters,currentUser);rawCreativeDaily=dSnap.docs.map(d=>({id:d.id,...d.data()}));creativeDaily=filterEntriesForViewer(rawCreativeDaily,currentUser);}catch(err){console.error(err);allPosters=[];creativeDaily=[];}}
+async function loadCod(){try{const snap=await db.collection('entries').where('kind','==','intern_cod').get();rawCodEntries=snap.docs.map(d=>({id:d.id,...d.data()}));codEntries=filterEntriesForViewer(rawCodEntries,currentUser);}catch(err){console.error(err);codEntries=[];}}
 
 function stats(){
   const s={total:0,live:0,whatsapp:0,shopee:0,tiktok:0,mamayuyu:0,solusi:0,leads:0,buyers:0,commission:0,wsCommission:0,tiktokCommission:0,shopeeCommission:0,carryIn:0,carryOut:0};
@@ -194,7 +218,10 @@ function renderDashboard(){
       const source = (typeof entries !== "undefined" && Array.isArray(entries)) ? entries :
                      (typeof allEntries !== "undefined" && Array.isArray(allEntries)) ? allEntries :
                      (typeof salesEntries !== "undefined" && Array.isArray(salesEntries)) ? salesEntries : [];
-      setupInternAdminFilter(source, typeof currentUser !== "undefined" ? currentUser : null);
+      setupInternAdminFilter(
+      (typeof rawAllSales !== "undefined" && Array.isArray(rawAllSales) && rawAllSales.length) ? rawAllSales : source,
+      typeof currentUser !== "undefined" ? currentUser : null
+    );
     } catch (e) { console.warn("Admin filter init:", e); }
   }, 0);
 
