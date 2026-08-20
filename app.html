@@ -33,7 +33,14 @@
     <header class="topbar">
       <div><div class="mobile-brand">INTERN SALES TRACKER</div><h1 id="page-title">Dashboard Sales Intern</h1><p id="page-subtitle">Prestasi sales bulan dipilih berbanding target.</p></div>
       <div class="top-actions">
-        <label class="month-control"><span>Bulan</span><input type="month" id="global-month"></label>
+        <label class="month-control"><span>Bulan</span>
+          <div class="intern-view-filter" id="internViewFilterWrap" style="display:none">
+            <label for="internViewFilter">Lihat Data</label>
+            <select id="internViewFilter">
+              <option value="all">Semua Intern</option>
+            </select>
+          </div>
+<input type="month" id="global-month"></label>
         <button class="icon-btn" id="theme-toggle" title="Tukar tema">🌙</button>
         <div class="user-pill"><div class="user-avatar" id="user-avatar">I</div><div><b id="user-name">Intern</b><span id="user-email">—</span></div></div>
         <button class="btn btn-ghost btn-small" id="logout-btn">Keluar</button>
