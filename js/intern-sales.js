@@ -1,3 +1,83 @@
+
+/* ===== ADMIN ALL-INTERN VIEW PATCH v5.3 =====
+   Admin emails below can view all staff entries.
+   Existing Firestore documents are untouched.
+*/
+const INTERN_ADMIN_EMAILS = [
+  "naim3905@gmail.com",
+  "mamariam.marketingm9fin@gmail.com"
+];
+
+let internViewMode = "self";
+let internSelectedUid = "all";
+let internKnownStaff = [];
+
+function isInternAdminUser(user) {
+  const email = String(user?.email || "").trim().toLowerCase();
+  return INTERN_ADMIN_EMAILS.includes(email);
+}
+
+function getInternDisplayName(entry) {
+  return entry.staffName || entry.userName || entry.name ||
+         entry.staffEmail || entry.email || entry.userEmail ||
+         (entry.staffUid ? `Intern ${String(entry.staffUid).slice(0,6)}` : "Intern");
+}
+
+function getInternEntryUid(entry) {
+  return entry.staffUid || entry.userUid || entry.uid || entry.createdBy || "";
+}
+
+function setupInternAdminFilter(entries, currentUser) {
+  const wrap = document.getElementById("internViewFilterWrap");
+  const select = document.getElementById("internViewFilter");
+  if (!wrap || !select) return;
+
+  const admin = isInternAdminUser(currentUser);
+  wrap.style.display = admin ? "flex" : "none";
+  internViewMode = admin ? "admin" : "self";
+
+  const byUid = new Map();
+  (entries || []).forEach(e => {
+    const uid = getInternEntryUid(e);
+    if (!uid) return;
+    if (!byUid.has(uid)) byUid.set(uid, getInternDisplayName(e));
+  });
+
+  internKnownStaff = Array.from(byUid.entries()).map(([uid, name]) => ({uid, name}));
+  const oldValue = select.value || internSelectedUid || "all";
+  select.innerHTML = '<option value="all">Semua Intern</option>' +
+    internKnownStaff.map(s => `<option value="${s.uid}">${s.name}</option>`).join("");
+
+  if (Array.from(select.options).some(o => o.value === oldValue)) {
+    select.value = oldValue;
+  } else {
+    select.value = "all";
+  }
+  internSelectedUid = select.value;
+
+  if (!select.dataset.bound) {
+    select.addEventListener("change", () => {
+      internSelectedUid = select.value;
+      if (typeof refreshAll === "function") refreshAll();
+      else if (typeof renderAll === "function") renderAll();
+      else if (typeof renderDashboard === "function") renderDashboard();
+      else window.location.reload();
+    });
+    select.dataset.bound = "1";
+  }
+}
+
+function filterEntriesForViewer(entries, currentUser) {
+  const list = Array.isArray(entries) ? entries : [];
+  if (isInternAdminUser(currentUser)) {
+    if (!internSelectedUid || internSelectedUid === "all") return list;
+    return list.filter(e => getInternEntryUid(e) === internSelectedUid);
+  }
+  const uid = currentUser?.uid || "";
+  return list.filter(e => getInternEntryUid(e) === uid);
+}
+/* ===== END ADMIN PATCH ===== */
+
 let currentUser=null;
 let currentProfile=null;
 let selectedMonth='';
@@ -63,7 +143,17 @@ auth.onAuthStateChanged(async user=>{
 
 async function loadProfile(){try{const snap=await db.collection('users').doc(currentUser.uid).get();currentProfile=snap.exists?snap.data():null;}catch(e){currentProfile=null;}const fallback=(currentUser.email||'Intern').split('@')[0].replace(/[._-]+/g,' ');const name=(currentProfile&&currentProfile.name)||fallback;byId('user-name').textContent=name;byId('user-email').textContent=currentUser.email||'—';byId('user-avatar').textContent=name.trim().charAt(0).toUpperCase()||'I';}
 
-async function refreshAll(){await Promise.all([loadSales(),loadTarget(),loadCreative(),loadCod()]);renderEverything();}
+async function refreshAll(){
+  /* admin-filter-refreshAll */
+  setTimeout(() => {
+    try {
+      const source = (typeof entries !== "undefined" && Array.isArray(entries)) ? entries :
+                     (typeof allEntries !== "undefined" && Array.isArray(allEntries)) ? allEntries :
+                     (typeof salesEntries !== "undefined" && Array.isArray(salesEntries)) ? salesEntries : [];
+      setupInternAdminFilter(source, typeof currentUser !== "undefined" ? currentUser : null);
+    } catch (e) { console.warn("Admin filter init:", e); }
+  }, 0);
+await Promise.all([loadSales(),loadTarget(),loadCreative(),loadCod()]);renderEverything();}
 async function loadSales(){try{const snap=await db.collection('entries').where('kind','==','intern_sales').get();allSales=snap.docs.map(d=>({id:d.id,...d.data()})).filter(e=>e.staffUid===currentUser.uid);}catch(err){console.error(err);toast('Tak dapat baca data sales. Semak Firestore Rules.','error');allSales=[];}calendarMonthSales=allSales.filter(e=>entryMonth(e)===selectedMonth).sort(sortEntries);monthSales=allSales.filter(e=>accountingMonthForEntry(e)===selectedMonth).sort(sortEntries);}
 function sortEntries(a,b){return(b.date||'').localeCompare(a.date||'')||((b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));}
 function targetDocId(){return `intern_target_${currentUser.uid}_${selectedMonth}`;}
@@ -98,6 +188,16 @@ function elapsedInfo(){const totalDays=daysInMonth(selectedMonth);const nowKey=c
 function renderEverything(){renderDashboard();renderInputTable();renderTarget();renderCreative();renderCod();renderReport();renderCharts();}
 
 function renderDashboard(){
+  /* admin-filter-renderDashboard */
+  setTimeout(() => {
+    try {
+      const source = (typeof entries !== "undefined" && Array.isArray(entries)) ? entries :
+                     (typeof allEntries !== "undefined" && Array.isArray(allEntries)) ? allEntries :
+                     (typeof salesEntries !== "undefined" && Array.isArray(salesEntries)) ? salesEntries : [];
+      setupInternAdminFilter(source, typeof currentUser !== "undefined" ? currentUser : null);
+    } catch (e) { console.warn("Admin filter init:", e); }
+  }, 0);
+
   const s=stats(),t=currentTarget,ach=pct(s.total,t.total);const {totalDays,elapsed,remaining}=elapsedInfo();const expected=totalDays?t.total*(elapsed/totalDays):0;const gap=Math.max(0,t.total-s.total);const dailyNeed=remaining?gap/remaining:gap;const avg=elapsed?s.total/elapsed:0;const forecast=elapsed?s.total/Math.max(1,elapsed)*totalDays:0;const paceDiff=s.total-expected;
   byId('dash-total-sales').textContent=money(s.total);byId('dash-total-target').textContent=money(t.total);byId('overall-progress-bar').style.width=`${clamp(ach,0,100)}%`;byId('overall-progress-text').textContent=`${ach.toFixed(1)}% dicapai`;byId('overall-gap-text').textContent=t.total?`Baki ${money(gap)}`:'Set target dahulu';
   byId('dash-tiktok-sales').textContent=money(s.tiktok);byId('dash-tiktok-meta').textContent=s.carryIn?`${money(s.carryIn)} carry-in termasuk dalam total`:'1–25hb cycle semasa';byId('dash-ws-sales').textContent=money(s.whatsapp);byId('dash-ws-meta').textContent=`${s.buyers} buyer · ${s.leads} leads`;byId('dash-commission').textContent=money(s.commission,2);byId('dash-commission-meta').textContent=`${currentTarget.commissionRate}% sales layak · cutoff TikTok 25hb`;
@@ -167,3 +267,17 @@ function renderReport(){const s=stats();byId('report-total').textContent=money(s
 byId('export-csv').addEventListener('click',()=>{const rows=[['Tarikh Asal','Jenis','Platform','Sales (RM)','Leads','Buyer','Masa Live (jam)','Cycle','Komisen (RM)','Nota'],...monthSales.map(e=>[e.date,e.channel==='whatsapp'?'WhatsApp':'Live',e.channel==='live'?platformLabel(e.platform):'',num(e.sales),num(e.leads),num(e.buyers),num(e.liveHours),isTikTok(e)&&entryDay(e)>=26?'Carry-in':'Semasa',commissionForEntry(e).toFixed(2),e.note||''])];const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`sales-intern-cycle-${selectedMonth}.csv`;a.click();URL.revokeObjectURL(a.href);});
 
 function renderCharts(){if(typeof Chart==='undefined'||!byId('trend-chart'))return;const s=stats(),d=daysInMonth(selectedMonth),byDay={};let start=s.carryIn;monthSales.forEach(e=>{if(entryMonth(e)!==selectedMonth)return;const day=entryDay(e);if(day)byDay[day]=(byDay[day]||0)+num(e.sales);});let cum=start;const labels=[],actual=[],target=[];for(let i=1;i<=d;i++){labels.push(String(i));cum+=byDay[i]||0;actual.push(cum);target.push(currentTarget.total*(i/d));}const css=getComputedStyle(document.documentElement),text=css.getPropertyValue('--text').trim()||'#eee',muted=css.getPropertyValue('--muted').trim()||'#888',grid=css.getPropertyValue('--line').trim()||'#222';if(trendChart)trendChart.destroy();trendChart=new Chart(byId('trend-chart'),{type:'line',data:{labels,datasets:[{label:'Sales Cumulative',data:actual,borderColor:'#ff4d5d',backgroundColor:'rgba(255,77,93,.12)',fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5},{label:'Target Pace',data:target,borderColor:'#7d8b9e',borderDash:[6,6],tension:.2,borderWidth:2,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:text,usePointStyle:true,boxWidth:8}}},scales:{x:{grid:{display:false},ticks:{color:muted,maxTicksLimit:10}},y:{grid:{color:grid},ticks:{color:muted,callback:v=>'RM'+Number(v).toLocaleString('en-MY')}}}}});if(mixChart)mixChart.destroy();mixChart=new Chart(byId('mix-chart'),{type:'doughnut',data:{labels:['TikTok Live','Shopee Live','WhatsApp'],datasets:[{data:[s.tiktok,s.shopee,s.whatsapp],backgroundColor:['#ef3340','#f2a93b','#2bc48a'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{color:text,usePointStyle:true,padding:18,boxWidth:8}}}}});}
+
+
+/* intern-admin-auth-listener-v53 */
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    try {
+      const u = (typeof currentUser !== "undefined" ? currentUser : null);
+      const source = (typeof entries !== "undefined" && Array.isArray(entries)) ? entries :
+                     (typeof allEntries !== "undefined" && Array.isArray(allEntries)) ? allEntries :
+                     (typeof salesEntries !== "undefined" && Array.isArray(salesEntries)) ? salesEntries : [];
+      setupInternAdminFilter(source, u);
+    } catch(e) {}
+  }, 800);
+});
