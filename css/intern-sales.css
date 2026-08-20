@@ -57,3 +57,34 @@
 #view-schedule .live-slot-copy small{font-size:10px}
 #view-schedule .schedule-note p{font-size:11px}
 @media(max-width:1180px){#view-schedule .schedule-summary-stats{min-width:0}}
+
+
+/* Admin: pilih data intern */
+.intern-view-filter{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  min-width:230px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+.intern-view-filter label{
+  font-size:11px;
+  font-weight:700;
+  color:#8fa8ad;
+  white-space:nowrap;
+}
+.intern-view-filter select{
+  width:100%;
+  min-width:135px;
+  border:0;
+  outline:0;
+  border-radius:8px;
+  background:#0d2428;
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  padding:8px 10px;
+}
