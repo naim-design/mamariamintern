@@ -138,6 +138,28 @@
             <form id="creative-daily-form"><div class="form-grid two"><label>Tarikh<input type="date" id="creative-date" required></label><label>Poster<select id="creative-poster-id" required></select></label></div><div class="form-grid two block-gap"><label>Leads Masuk<input type="number" id="creative-leads" min="0" step="1" value="0" required></label><label>Buyer / Closing<input type="number" id="creative-buyers" min="0" step="1" value="0"></label></div><div class="form-grid block-gap"><label>Sales dari poster (optional)<input type="number" id="creative-sales" min="0" step="0.01" value="0"></label></div><div class="form-grid block-gap"><label>Nota<textarea id="creative-daily-note" rows="2" placeholder="cth: Leads banyak tapi low quality / marketer off petang"></textarea></label></div><div class="form-actions"><button class="btn btn-primary" type="submit">Simpan Performance</button></div></form>
           </article>
         </div>
+        <article class="panel creative-lead-panel">
+          <div class="panel-head"><div><span class="eyebrow">LEAD CONVERSATION TRACKER</span><h2>Last Conversation Setiap Lead</h2><p>Masukkan setiap nombor yang datang daripada poster dan tandakan customer berhenti di stage mana.</p></div><span class="status-chip" id="creative-lead-count">0 nombor</span></div>
+          <div class="creative-lead-layout">
+            <form id="creative-lead-form" class="creative-lead-form">
+              <div class="form-grid two"><label>Tarikh Lead<input type="date" id="creative-lead-date" required></label><label>Poster<select id="creative-lead-poster" required></select></label></div>
+              <div class="form-grid two block-gap"><label>No. Telefon<input id="creative-lead-phone" required placeholder="cth: 0123456789"></label><label>Last Conversation<select id="creative-lead-stage" required><option value="masuk">Permulaan Masuk</option><option value="problem">Problem / Tanya Masalah</option><option value="faq">FAQ / Tanya Soalan</option><option value="harga">Harga</option></select></label></div>
+              <div class="form-grid block-gap"><label>Nota (optional)<textarea id="creative-lead-note" rows="2" placeholder="cth: Tanya harga pakej 4 botol / senyap selepas explain masalah"></textarea></label></div>
+              <div class="form-actions"><button class="btn btn-primary" type="submit" id="creative-lead-submit">Simpan Lead</button><button class="btn" type="button" id="creative-lead-cancel" style="display:none">Batal Edit</button></div>
+            </form>
+            <div class="creative-funnel-wrap">
+              <span class="eyebrow">FUNNEL BULAN INI</span><h3>Lead Berhenti Dekat Mana?</h3>
+              <div class="creative-funnel-grid">
+                <div class="funnel-stage"><span>Permulaan</span><b id="lead-stage-masuk">0</b><small>baru masuk</small></div>
+                <div class="funnel-stage"><span>Problem</span><b id="lead-stage-problem">0</b><small>tanya masalah</small></div>
+                <div class="funnel-stage"><span>FAQ</span><b id="lead-stage-faq">0</b><small>tanya soalan</small></div>
+                <div class="funnel-stage price-stage"><span>Harga</span><b id="lead-stage-harga">0</b><small>sampai harga</small></div>
+              </div>
+              <div class="funnel-insight" id="creative-funnel-insight">Belum ada rekod nombor untuk bulan ini.</div>
+            </div>
+          </div>
+          <div class="table-scroll creative-lead-table-wrap"><table class="creative-lead-table"><thead><tr><th>Tarikh</th><th>No. Telefon</th><th>Poster</th><th>Last Conversation</th><th>Nota</th><th>Tindakan</th></tr></thead><tbody id="creative-lead-body"></tbody></table></div>
+        </article>
         <div class="charts-grid creative-charts"><article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">POSTER RANKING</span><h3>Leads Mengikut Poster</h3></div></div><div class="chart-wrap"><canvas id="creative-poster-chart"></canvas></div></article><article class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow">CREATIVE TYPE</span><h3>Leads Mengikut Jenis</h3></div></div><div class="chart-wrap small"><canvas id="creative-type-chart"></canvas></div></article></div>
         <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">ANALYSIS</span><h2>Poster Performance</h2></div><span class="status-chip" id="creative-ranking-count">0 poster</span></div><div class="table-scroll"><table class="creative-table"><thead><tr><th>Poster</th><th>Jenis</th><th>Status</th><th>Leads</th><th>Buyer</th><th>Sales</th><th>Avg Leads/Hari</th><th>Last Update</th><th>Tindakan</th></tr></thead><tbody id="creative-ranking-body"></tbody></table></div></article>
         <article class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">BY DAY</span><h3>Rekod Performance Harian</h3></div></div><div class="table-scroll"><table><thead><tr><th>Tarikh</th><th>Poster</th><th>Leads</th><th>Buyer</th><th>Sales</th><th>Nota</th><th>Tindakan</th></tr></thead><tbody id="creative-daily-body"></tbody></table></div></article>
