@@ -129,9 +129,9 @@ const todayISO=()=>new Date().toLocaleDateString('en-CA');
 const currentMonthKey=()=>todayISO().slice(0,7);
 const entryMonth=e=>e.monthKey||(e.date||'').slice(0,7);
 const entryDay=e=>Number((e.date||'').slice(8,10))||0;
-const isTikTok=e=>e.channel==='live'&&(e.platform==='solusi'||e.platform==='mamayuyu');
+const isTikTok=e=>e.channel==='live'&&(e.platform==='solusi'||e.platform==='mamayuyu'||e.platform==='hq'||e.platform==='TikTok Live HQ');
 const isShopee=e=>e.channel==='live'&&e.platform==='shopee';
-const platformLabel=p=>({shopee:'Shopee',mamayuyu:'TikTok Mamayuyu',solusi:'TikTok Solusi'}[p]||'—');
+const platformLabel=p=>({shopee:'Shopee',mamayuyu:'TikTok Mamayuyu',solusi:'TikTok Solusi',hq:'TikTok Live HQ','TikTok Live HQ':'TikTok Live HQ'}[p]||'—');
 const sourceLabel=e=>e.channel==='whatsapp'?'WhatsApp':`Live · ${platformLabel(e.platform)}`;
 
 function blankTarget(){return{ws1:1000,ws2:1000,ws3:1000,tt1:1000,tt2:1000,tt3:1000,ttCarry:1000,shopee:2000,commissionRate:4,whatsapp:3000,tiktok:3000,total:8000};}
@@ -149,7 +149,7 @@ function toast(message,type='ok'){const el=byId('toast');el.textContent=message;
 function setThemeIcon(){const light=document.documentElement.getAttribute('data-theme')==='light';byId('theme-toggle').textContent=light?'☀️':'🌙';}
 function toggleTheme(){const light=document.documentElement.getAttribute('data-theme')==='light';if(light){document.documentElement.removeAttribute('data-theme');localStorage.setItem('internTheme','dark');}else{document.documentElement.setAttribute('data-theme','light');localStorage.setItem('internTheme','light');}setThemeIcon();renderCharts();renderCreativeCharts();}
 
-const viewCopy={dashboard:['Dashboard Sales Intern','Prestasi sales bulan dipilih berbanding target dan cutoff.'],input:['Input Sales Harian','Rekod sales Live atau WhatsApp.'],target:['Target & Komisen','Tetapkan target fleksibel ikut tempoh dan lihat progress.'],creative:['Creative Analysis','Kenal pasti poster dan angle yang paling banyak membawa leads.'],cod:['COD Tracker','Pantau customer COD, tracking, penghantaran dan status bayaran.'],schedule:['Jadual Live Luqman','Semak slot Live Shopee HQ, TikTok Mamayuyu dan TikTok Solusi.'],report:['Laporan Sales','Sales yang dikira mengikut cycle cutoff TikTok.']};
+const viewCopy={dashboard:['Dashboard Sales Intern','Prestasi sales bulan dipilih berbanding target dan cutoff.'],input:['Input Sales Harian','Rekod sales Live atau WhatsApp.'],target:['Target & Komisen','Tetapkan target fleksibel ikut tempoh dan lihat progress.'],creative:['Creative Analysis','Kenal pasti poster dan angle yang paling banyak membawa leads.'],cod:['COD Tracker','Pantau customer COD, tracking, penghantaran dan status bayaran.'],schedule:['Jadual Live Luqman','Semak slot Shopee HQ, TikTok Mamayuyu, TikTok Solusi dan TikTok Live HQ.'],report:['Laporan Sales','Sales yang dikira mengikut cycle cutoff TikTok.']};
 function switchView(name){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const view=byId(`view-${name}`);if(!view)return;view.classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===name));const copy=viewCopy[name]||viewCopy.dashboard;byId('page-title').textContent=copy[0];byId('page-subtitle').textContent=copy[1];window.scrollTo({top:0,behavior:'smooth'});if(name==='creative')setTimeout(renderCreativeCharts,50);if(name==='dashboard')setTimeout(renderCharts,50);}
 
 document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
