@@ -112,7 +112,7 @@
         <div class="page-grid form-page-grid">
           <article class="panel form-panel"><div class="panel-head"><div><span class="eyebrow">INPUT HARIAN</span><h2 id="sales-form-title">Rekod Sales Baru</h2></div><span class="status-chip">Live / WhatsApp</span></div>
             <form id="sales-form"><div class="form-grid two"><label>Tarikh<input type="date" id="sale-date" required></label><label>Sumber Sales<select id="sale-source"><option value="live">Live</option><option value="whatsapp">WhatsApp</option></select></label></div>
-              <div id="live-fields" class="form-grid two block-gap"><label>Platform Live<select id="sale-platform"><option value="shopee">Shopee</option><option value="mamayuyu">TikTok Mamayuyu</option><option value="solusi">TikTok Solusi</option>  <option value="TikTok Live HQ">TikTok Live HQ</option>
+              <div id="live-fields" class="form-grid two block-gap"><label>Platform Live<select id="sale-platform"><option value="shopee">Shopee</option><option value="mamayuyu">TikTok Mamayuyu</option><option value="solusi">TikTok Solusi</option>  <option value="hq">TikTok Live HQ</option>
 </select></label><label>Masa Live (jam)<input type="number" id="sale-live-hours" min="0" step="0.25" placeholder="cth: 2.5"></label></div>
               <div id="whatsapp-fields" class="form-grid two block-gap" hidden><label>Leads / Prospek<input type="number" id="sale-leads" min="0" step="1" value="0"></label><label>Buyer<input type="number" id="sale-buyers" min="0" step="1" value="0"></label></div>
               <div class="form-grid block-gap"><label>Jumlah Sales (RM)<input class="money-input" type="number" id="sale-amount" min="0" step="0.01" required placeholder="0.00"></label></div>
@@ -192,8 +192,8 @@
       <section id="view-schedule" class="view">
         <div class="schedule-hero">
           <article class="panel schedule-summary-card">
-            <div><span class="eyebrow">JADUAL LIVE INTERN LUQMAN</span><h2>Slot Live Mingguan</h2><p>Jadual khas Luqman sahaja. Susunan ini memudahkan semakan platform, hari dan waktu live tanpa bercampur dengan staf lain.</p></div>
-            <div class="schedule-summary-stats"><div><span>Total Slot / Minggu</span><b>7</b></div><div><span>Platform</span><b>3</b></div><div><span>Hari Aktif</span><b>5</b></div></div>
+            <div><span class="eyebrow">JADUAL LIVE INTERN LUQMAN</span><h2>Slot Live Mingguan</h2><p>Jadual khas Luqman sahaja untuk Shopee HQ, TikTok Mamayuyu, TikTok Solusi dan TikTok Live HQ.</p></div>
+            <div class="schedule-summary-stats"><div><span>Total Slot / Minggu</span><b>8</b></div><div><span>Platform</span><b>4</b></div><div><span>Hari Aktif</span><b>5</b></div></div>
           </article>
         </div>
 
@@ -201,6 +201,7 @@
           <div class="schedule-platform shopee"><span>S</span><div><b>Shopee HQ</b><small>5 slot / minggu</small></div></div>
           <div class="schedule-platform mamayuyu"><span>M</span><div><b>TikTok Mamayuyu</b><small>1 slot / minggu</small></div></div>
           <div class="schedule-platform solusi"><span>T</span><div><b>TikTok Solusi</b><small>1 slot / minggu</small></div></div>
+          <div class="schedule-platform tiktok-hq"><span>H</span><div><b>TikTok Live HQ</b><small>1 slot / minggu</small></div></div>
         </div>
 
         <div class="weekly-live-grid">
@@ -211,14 +212,14 @@
           </article>
 
           <article class="live-day-card">
-            <div class="live-day-head"><div><span>ISNIN</span><small>1 slot</small></div></div>
+            <div class="live-day-head"><div><span>ISNIN</span><small>2 slot</small></div></div>
             <div class="live-slot shopee"><div class="live-time"><b>9:00 AM</b><span>hingga</span><b>10:30 AM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
+            <div class="live-slot solusi"><div class="live-time"><b>1:40 PM</b><span>hingga</span><b>3:10 PM</b></div><div class="live-slot-copy"><span class="platform-badge solusi">TikTok Solusi</span><strong>Live TikTok Solusi</strong><small>Intern Luqman</small></div></div>
           </article>
 
           <article class="live-day-card">
-            <div class="live-day-head"><div><span>SELASA</span><small>2 slot</small></div></div>
-            <div class="live-slot solusi"><div class="live-time"><b>7:30 AM</b><span>hingga</span><b>9:00 AM</b></div><div class="live-slot-copy"><span class="platform-badge solusi">TikTok Solusi</span><strong>Live TikTok Solusi</strong><small>Intern Luqman</small></div></div>
-            <div class="live-slot shopee"><div class="live-time"><b>1:00 PM</b><span>hingga</span><b>2:30 PM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
+            <div class="live-day-head"><div><span>SELASA</span><small>1 slot</small></div></div>
+            <div class="live-slot tiktok-hq"><div class="live-time"><b>7:30 AM</b><span>hingga</span><b>9:00 AM</b></div><div class="live-slot-copy"><span class="platform-badge tiktok-hq">TikTok Live HQ</span><strong>Live TikTok HQ</strong><small>Intern Luqman</small></div></div>
           </article>
 
           <article class="live-day-card">
@@ -227,14 +228,15 @@
           </article>
 
           <article class="live-day-card">
-            <div class="live-day-head"><div><span>KHAMIS</span><small>1 slot</small></div></div>
+            <div class="live-day-head"><div><span>KHAMIS</span><small>2 slot</small></div></div>
             <div class="live-slot shopee"><div class="live-time"><b>9:00 AM</b><span>hingga</span><b>10:30 AM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
+            <div class="live-slot shopee"><div class="live-time"><b>1:00 PM</b><span>hingga</span><b>2:30 PM</b></div><div class="live-slot-copy"><span class="platform-badge shopee">Shopee HQ</span><strong>Live Shopee</strong><small>Intern Luqman</small></div></div>
           </article>
         </div>
 
         <article class="panel schedule-note">
           <span class="eyebrow">NOTA JADUAL</span>
-          <p>Jadual ini mengambil slot khusus <b>Intern Luqman/Lokman</b> untuk Shopee HQ dan TikTok Mamayuyu, termasuk tambahan Shopee pada Isnin 9:00 AM–10:30 AM serta TikTok Solusi pada Selasa 7:30 AM–9:00 AM.</p>
+          <p>Selasa khas <b>TikTok Live HQ 7:30 AM–9:00 AM</b> dan tiada slot Shopee. Isnin ada tambahan <b>TikTok Solusi 1:40 PM–3:10 PM</b>. Khamis ada dua slot Shopee termasuk <b>1:00 PM–2:30 PM</b>.</p>
         </article>
       </section>
 
