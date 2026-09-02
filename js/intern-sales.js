@@ -310,3 +310,62 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch(e) {}
   }, 800);
 });
+
+
+/* ===== V5.7 MONTH SELECTOR FIX ===== */
+function monthKeyToMalayLabel(key){
+  if(!key || !/^\d{4}-\d{2}$/.test(key)) return '';
+  const [y,m]=key.split('-').map(Number);
+  const names=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+  return `${names[m-1]} ${y}`;
+}
+function shiftMonthKey(key,delta){
+  const [y,m]=String(key||'').split('-').map(Number);
+  if(!y||!m) return key;
+  const d=new Date(y,m-1+delta,1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function syncMonthDisplay(){
+  const input=document.querySelector('input[type="month"]');
+  const btn=document.getElementById('monthDisplayBtn');
+  if(!input||!btn) return;
+  btn.textContent=monthKeyToMalayLabel(input.value||((typeof selectedMonth!=='undefined')?selectedMonth:''));
+}
+function applyMonthFromControl(nextMonth){
+  const input=document.querySelector('input[type="month"]');
+  if(!input||!nextMonth) return;
+  input.value=nextMonth;
+  input.dispatchEvent(new Event('change',{bubbles:true}));
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  syncMonthDisplay();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    const input=document.querySelector('input[type="month"]');
+    const prev=document.getElementById('monthPrevBtn');
+    const next=document.getElementById('monthNextBtn');
+    const display=document.getElementById('monthDisplayBtn');
+    if(!input) return;
+    syncMonthDisplay();
+    input.addEventListener('change',syncMonthDisplay);
+    input.addEventListener('input',syncMonthDisplay);
+    if(prev&&!prev.dataset.bound){
+      prev.addEventListener('click',()=>applyMonthFromControl(shiftMonthKey(input.value||selectedMonth,-1)));
+      prev.dataset.bound='1';
+    }
+    if(next&&!next.dataset.bound){
+      next.addEventListener('click',()=>applyMonthFromControl(shiftMonthKey(input.value||selectedMonth,1)));
+      next.dataset.bound='1';
+    }
+    if(display&&!display.dataset.bound){
+      display.addEventListener('click',()=>{
+        try{
+          if(typeof input.showPicker==='function') input.showPicker();
+          else input.focus();
+        }catch(e){input.focus();}
+      });
+      display.dataset.bound='1';
+    }
+  },350);
+});
+/* ===== END V5.7 MONTH SELECTOR FIX ===== */
