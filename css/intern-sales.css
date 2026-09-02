@@ -169,3 +169,9 @@
   background:rgba(0,242,234,.12);
   color:#62fff8;
 }
+
+
+/* TikTok Live HQ */
+.live-slot.tiktok-hq{border-left-color:#00f2ea}
+.platform-badge.tiktok-hq{background:rgba(0,242,234,.12);color:#54fff7}
+.schedule-platform.tiktok-hq span{background:rgba(0,242,234,.12);color:#54fff7}
