@@ -369,3 +369,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   },350);
 });
 /* ===== END V5.7 MONTH SELECTOR FIX ===== */
+
+
+const LIVE_SCHEDULE = {
+  AHAD: [
+    { platform:'TikTok Mamayuyu', title:'Live TikTok Mamayuyu', time:'10:00 AM – 11:00 AM', person:'Intern Luqman' },
+    { platform:'Shopee HQ', title:'Live Shopee', time:'3:45 PM – 5:15 PM', person:'Intern Luqman' }
+  ],
+  ISNIN: [
+    { platform:'Shopee HQ', title:'Live Shopee', time:'9:00 AM – 10:30 AM', person:'Intern Luqman' },
+    { platform:'TikTok Solusi', title:'Live TikTok Solusi', time:'1:40 PM – 3:10 PM', person:'Intern Luqman' }
+  ],
+  SELASA: [
+    { platform:'TikTok Live HQ', title:'Live TikTok HQ', time:'7:30 AM – 9:00 AM', person:'Intern Luqman' }
+  ],
+  RABU: [
+    { platform:'Shopee HQ', title:'Live Shopee', time:'10:45 AM – 12:15 PM', person:'Intern Luqman' }
+  ],
+  KHAMIS: [
+    { platform:'Shopee HQ', title:'Live Shopee', time:'9:00 AM – 10:30 AM', person:'Intern Luqman' },
+    { platform:'Shopee HQ', title:'Live Shopee', time:'1:00 PM – 2:30 PM', person:'Intern Luqman' }
+  ]
+};
