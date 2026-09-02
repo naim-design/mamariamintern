@@ -40,7 +40,17 @@
               <option value="all">Semua Intern</option>
             </select>
           </div>
-<input type="month" id="global-month"></label>
+
+<div class="month-nav-control">
+  <button type="button" class="month-nav-btn" id="monthPrevBtn" aria-label="Bulan sebelumnya">‹</button>
+  <div class="month-nav-center">
+    <span class="month-nav-label">Bulan</span>
+    <button type="button" class="month-display-btn" id="monthDisplayBtn">Ogos 2026</button>
+    <input type="month" id="global-month">
+  </div>
+  <button type="button" class="month-nav-btn" id="monthNextBtn" aria-label="Bulan seterusnya">›</button>
+</div>
+</label>
         <button class="icon-btn" id="theme-toggle" title="Tukar tema">🌙</button>
         <div class="user-pill"><div class="user-avatar" id="user-avatar">I</div><div><b id="user-name">Intern</b><span id="user-email">—</span></div></div>
         <button class="btn btn-ghost btn-small" id="logout-btn">Keluar</button>
