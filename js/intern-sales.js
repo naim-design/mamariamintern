@@ -179,26 +179,73 @@ async function refreshAll(){
     } catch (e) { console.warn("Admin filter init:", e); }
   }, 0);
 await Promise.all([loadSales(),loadTarget(),loadCreative(),loadCod()]);renderEverything();}
-async function loadSales(){try{const snap=await db.collection('entries').where('kind','==','intern_sales').get();rawAllSales=snap.docs.map(d=>({id:d.id,...d.data()}));allSales=filterEntriesForViewer(rawAllSales,currentUser);}catch(err){console.error(err);toast('Tak dapat baca data sales. Semak Firestore Rules.','error');allSales=[];}calendarMonthSales=allSales.filter(e=>entryMonth(e)===selectedMonth).sort(sortEntries);monthSales=allSales.filter(e=>accountingMonthForEntry(e)===selectedMonth).sort(sortEntries);}
+async function loadSales(){
+  try{
+    let snap;
+    try{
+      // Admin cuba baca semua intern. User biasa baca data sendiri sahaja.
+      if(isInternAdminUser(currentUser)){
+        snap=await db.collection('entries').where('kind','==','intern_sales').get();
+      }else{
+        snap=await db.collection('entries').where('kind','==','intern_sales').where('staffUid','==',currentUser.uid).get();
+      }
+    }catch(primaryErr){
+      console.warn('Primary sales query failed, fallback own data:',primaryErr);
+      // Fallback penting: walaupun Firestore Rules belum benarkan admin baca semua,
+      // dashboard tidak kosong — baca sekurang-kurangnya data akaun semasa.
+      snap=await db.collection('entries').where('kind','==','intern_sales').where('staffUid','==',currentUser.uid).get();
+      if(isInternAdminUser(currentUser)) toast('Paparan semua intern perlukan Firestore Rules dikemas kini. Buat masa ini data akaun ini dipaparkan.','error');
+    }
+    rawAllSales=snap.docs.map(d=>({id:d.id,...d.data()}));
+    allSales=filterEntriesForViewer(rawAllSales,currentUser);
+  }catch(err){
+    console.error('loadSales failed:',err);
+    toast('Tak dapat baca data sales. Semak login atau Firestore Rules.','error');
+    rawAllSales=[];allSales=[];
+  }
+  calendarMonthSales=allSales.filter(e=>entryMonth(e)===selectedMonth).sort(sortEntries);
+  monthSales=allSales.filter(e=>accountingMonthForEntry(e)===selectedMonth).sort(sortEntries);
+}
 function sortEntries(a,b){return(b.date||'').localeCompare(a.date||'')||((b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));}
-function targetDocId(){return `intern_target_${currentUser.uid}_${selectedMonth}`;}
+function targetDocId(){return `intern_target_shared_${selectedMonth}`;}
+function targetFromDoc(d={}){
+  const hasOldWs=d.whatsapp!==undefined;
+  const hasOldTt=d.tiktok!==undefined||d.mamayuyu!==undefined||d.solusi!==undefined;
+  const oldWs=num(d.whatsapp);
+  const oldTt=d.tiktok!==undefined?num(d.tiktok):num(d.mamayuyu)+num(d.solusi);
+  return calcTarget({
+    ws1:d.ws1!==undefined?num(d.ws1):(hasOldWs?oldWs/3:1000),
+    ws2:d.ws2!==undefined?num(d.ws2):(hasOldWs?oldWs/3:1000),
+    ws3:d.ws3!==undefined?num(d.ws3):(hasOldWs?oldWs/3:1000),
+    tt1:d.tt1!==undefined?num(d.tt1):(hasOldTt?oldTt/3:1000),
+    tt2:d.tt2!==undefined?num(d.tt2):(hasOldTt?oldTt/3:1000),
+    tt3:d.tt3!==undefined?num(d.tt3):(hasOldTt?oldTt/3:1000),
+    ttCarry:d.ttCarry!==undefined?num(d.ttCarry):1000,
+    shopee:d.shopee!==undefined?num(d.shopee):2000,
+    commissionRate:d.commissionRate!==undefined?num(d.commissionRate):4
+  });
+}
 async function loadTarget(){
   try{
-    const snap=await db.collection('meta').doc(targetDocId()).get();
-    if(!snap.exists){currentTarget=calcTarget(blankTarget());}
-    else{
-      const d=snap.data();
-      const hasOldWs=d.whatsapp!==undefined;
-      const hasOldTt=d.tiktok!==undefined||d.mamayuyu!==undefined||d.solusi!==undefined;
-      const oldWs=num(d.whatsapp);const oldTt=d.tiktok!==undefined?num(d.tiktok):num(d.mamayuyu)+num(d.solusi);
-      currentTarget=calcTarget({
-        ws1:d.ws1!==undefined?num(d.ws1):(hasOldWs?oldWs/3:1000),ws2:d.ws2!==undefined?num(d.ws2):(hasOldWs?oldWs/3:1000),ws3:d.ws3!==undefined?num(d.ws3):(hasOldWs?oldWs/3:1000),
-        tt1:d.tt1!==undefined?num(d.tt1):(hasOldTt?oldTt/3:1000),tt2:d.tt2!==undefined?num(d.tt2):(hasOldTt?oldTt/3:1000),tt3:d.tt3!==undefined?num(d.tt3):(hasOldTt?oldTt/3:1000),
-        ttCarry:d.ttCarry!==undefined?num(d.ttCarry):1000,shopee:d.shopee!==undefined?num(d.shopee):2000,commissionRate:d.commissionRate!==undefined?num(d.commissionRate):4
-      });
+    let snap=await db.collection('meta').doc(targetDocId()).get();
+    if(snap.exists){
+      currentTarget=targetFromDoc(snap.data());
+    }else{
+      // Migration: cari target lama bulan yang sama dari mana-mana akaun,
+      // dan guna rekod yang paling baru dikemaskini.
+      const legacySnap=await db.collection('meta').where('kind','==','intern_target').get();
+      const rows=legacySnap.docs
+        .map(d=>({id:d.id,...d.data()}))
+        .filter(d=>d.monthKey===selectedMonth)
+        .sort((a,b)=>((b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0)));
+      currentTarget=rows.length?targetFromDoc(rows[0]):calcTarget(blankTarget());
     }
-  }catch(err){console.error(err);currentTarget=calcTarget(blankTarget());}
-  setTargetInputs();updateTargetPreview();
+  }catch(err){
+    console.error(err);
+    currentTarget=calcTarget(blankTarget());
+  }
+  setTargetInputs();
+  updateTargetPreview();
 }
 async function loadCreative(){try{const [pSnap,dSnap]=await Promise.all([db.collection('posters').where('kind','==','intern_creative').get(),db.collection('entries').where('kind','==','intern_creative_daily').get()]);rawAllPosters=pSnap.docs.map(d=>({id:d.id,...d.data()}));allPosters=filterEntriesForViewer(rawAllPosters,currentUser);rawCreativeDaily=dSnap.docs.map(d=>({id:d.id,...d.data()}));creativeDaily=filterEntriesForViewer(rawCreativeDaily,currentUser);}catch(err){console.error(err);allPosters=[];creativeDaily=[];}}
 async function loadCod(){try{const snap=await db.collection('entries').where('kind','==','intern_cod').get();rawCodEntries=snap.docs.map(d=>({id:d.id,...d.data()}));codEntries=filterEntriesForViewer(rawCodEntries,currentUser);}catch(err){console.error(err);codEntries=[];}}
@@ -250,7 +297,7 @@ function setTargetInputs(){byId('target-ws-1').value=currentTarget.ws1;byId('tar
 function readTargetInputs(){return calcTarget({ws1:num(byId('target-ws-1').value),ws2:num(byId('target-ws-2').value),ws3:num(byId('target-ws-3').value),tt1:num(byId('target-tt-1').value),tt2:num(byId('target-tt-2').value),tt3:num(byId('target-tt-3').value),ttCarry:num(byId('target-tt-carry').value),shopee:num(byId('target-shopee').value),commissionRate:num(byId('commission-rate').value)});}
 function updateTargetPreview(){const t=readTargetInputs();byId('target-total-preview').textContent=money(t.total);byId('target-ws-preview').textContent=money(t.whatsapp);byId('target-tiktok-preview').textContent=money(t.tiktok);byId('target-shopee-preview').textContent=money(t.shopee);byId('target-ws-total-preview').textContent=money(t.whatsapp);byId('target-tt-total-preview').textContent=money(t.tiktok);byId('target-shopee-total-preview').textContent=money(t.shopee);byId('target-grand-preview').textContent=money(t.total);byId('target-carry-preview').textContent=money(t.ttCarry);}
 ['target-ws-1','target-ws-2','target-ws-3','target-tt-1','target-tt-2','target-tt-3','target-tt-carry','target-shopee','commission-rate'].forEach(id=>byId(id).addEventListener('input',updateTargetPreview));
-byId('target-form').addEventListener('submit',async e=>{e.preventDefault();const t=readTargetInputs();try{await db.collection('meta').doc(targetDocId()).set({kind:'intern_target',staffUid:currentUser.uid,monthKey:selectedMonth,...t,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});currentTarget=t;toast(`Target ${monthLabel(selectedMonth)} disimpan.`);renderEverything();}catch(err){console.error(err);toast('Gagal simpan target.','error');}});
+byId('target-form').addEventListener('submit',async e=>{e.preventDefault();const t=readTargetInputs();try{await db.collection('meta').doc(targetDocId()).set({kind:'intern_target_shared',monthKey:selectedMonth,...t,updatedByUid:currentUser.uid,updatedByEmail:currentUser.email||'',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});currentTarget=t;toast(`Target ${monthLabel(selectedMonth)} disimpan untuk semua intern.`);renderEverything();}catch(err){console.error(err);toast('Gagal simpan target.','error');}});
 function segmentActuals(){const rows=calendarMonthSales;const ws=rows.filter(e=>e.channel==='whatsapp'),tt=rows.filter(isTikTok),sh=rows.filter(isShopee);const sum=(arr,a,b)=>arr.filter(e=>entryDay(e)>=a&&entryDay(e)<=b).reduce((n,e)=>n+num(e.sales),0);const end=daysInMonth(selectedMonth);return{ws1:sum(ws,1,10),ws2:sum(ws,11,20),ws3:sum(ws,21,end),tt1:sum(tt,1,8),tt2:sum(tt,9,16),tt3:sum(tt,17,25),ttCarry:sum(tt,26,end),shopee:sh.reduce((n,e)=>n+num(e.sales),0)};}
 function renderTarget(){updateTargetPreview();const a=segmentActuals(),t=currentTarget;const cards=[['WhatsApp 1–10hb',a.ws1,t.ws1],['WhatsApp 11–20hb',a.ws2,t.ws2],['WhatsApp 21–Akhir',a.ws3,t.ws3],['TikTok 1–8hb',a.tt1,t.tt1],['TikTok 9–16hb',a.tt2,t.tt2],['TikTok 17–25hb',a.tt3,t.tt3],['TikTok 26–Akhir · Carry',a.ttCarry,t.ttCarry],['Shopee · Sebulan',a.shopee,t.shopee]];byId('target-progress-grid').innerHTML=cards.map(([label,actual,target])=>{const p=pct(actual,target),ok=target>0&&actual>=target;const cls=target===0?'neutral':ok?'achieved':'behind';return `<div class="segment-card ${cls}"><div class="segment-head"><span>${label}</span><b>${target?`${p.toFixed(0)}%`:'—'}</b></div><strong>${money(actual)}</strong><small>Target ${money(target)}</small><div class="segment-bar"><i style="width:${clamp(p,0,100)}%"></i></div><em>${target===0?'Tiada target':ok?`Lebih ${money(actual-target)}`:`Kurang ${money(target-actual)}`}</em></div>`;}).join('');}
 
@@ -391,3 +438,59 @@ const LIVE_SCHEDULE = {
     { platform:'Shopee HQ', title:'Live Shopee', time:'1:00 PM – 2:30 PM', person:'Intern Luqman' }
   ]
 };
+
+
+/* ===== V6.3 SEEDING + TODO ===== */
+let seedingEntries=[],todoEntries=[],editingSeedingId=null,editingTodoId=null;
+const sLabel=v=>v==='done'?'Done':v==='progress'?'In Progress':'Belum';
+const sClass=v=>v==='done'?'done':v==='progress'?'progress':'belum';
+
+async function loadSeedingTodo(){
+  try{
+    const snap=await db.collection('entries').get();
+    const rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+    seedingEntries=rows.filter(x=>x.kind==='intern_seeding');
+    todoEntries=rows.filter(x=>x.kind==='intern_todo');
+  }catch(e){console.error(e);seedingEntries=[];todoEntries=[];}
+}
+function renderSeeding(){
+  const cal=document.getElementById('seeding-calendar'),tb=document.getElementById('seeding-table-body');
+  if(!cal||!tb)return;
+  const [y,m]=selectedMonth.split('-').map(Number),days=new Date(y,m,0).getDate(),offset=new Date(y,m-1,1).getDay();
+  document.getElementById('seeding-month-title').textContent=monthLabel(selectedMonth);
+  const rows=seedingEntries.filter(x=>(x.date||'').startsWith(selectedMonth)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  let h=''; for(let i=0;i<offset;i++)h+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=days;d++){const date=`${selectedMonth}-${String(d).padStart(2,'0')}`,items=rows.filter(x=>x.date===date);
+    h+=`<div class="cal-cell"><div class="cal-day">${d}</div>${items.map(x=>`<button class="cal-item ${sClass(x.status)}" data-seeding-edit="${x.id}"><b>${escapeHtml(x.channel||'')}</b><small>${sLabel(x.status)}</small></button>`).join('')}</div>`}
+  cal.innerHTML=h;
+  tb.innerHTML=rows.length?rows.map(x=>`<tr><td>${formatDateMs(x.date)}</td><td>${escapeHtml(x.channel||'')}</td><td><span class="status-chip ${sClass(x.status)}">${sLabel(x.status)}</span></td><td>${escapeHtml(x.note||'—')}</td><td><div class="row-actions"><button data-seeding-edit="${x.id}">Edit</button><button class="danger" data-seeding-delete="${x.id}">Padam</button></div></td></tr>`).join(''):'<tr><td colspan="5">Belum ada rekod.</td></tr>';
+  document.querySelectorAll('[data-seeding-edit]').forEach(b=>b.onclick=()=>editSeeding(b.dataset.seedingEdit));
+  document.querySelectorAll('[data-seeding-delete]').forEach(b=>b.onclick=()=>delSeeding(b.dataset.seedingDelete));
+}
+function editSeeding(id){const x=seedingEntries.find(r=>r.id===id);if(!x)return;editingSeedingId=id;seeding-date.value=x.date||'';seeding-channel.value=x.channel||'Facebook Page';seeding-status.value=x.status||'belum';seeding-note.value=x.note||'';document.getElementById('seeding-submit-btn').textContent='Update Seeding';document.getElementById('seeding-cancel-edit').style.display='';}
+async function delSeeding(id){if(!confirm('Padam rekod seeding ini?'))return;await db.collection('entries').doc(id).delete();await refreshSeedingTodo();}
+function resetSeeding(){editingSeedingId=null;document.getElementById('seeding-submit-btn').textContent='Simpan Seeding';document.getElementById('seeding-cancel-edit').style.display='none';document.getElementById('seeding-note').value='';document.getElementById('seeding-status').value='belum';}
+
+function renderTodo(){
+  const box=document.getElementById('todo-day-list');if(!box)return;
+  const rows=todoEntries.filter(x=>(x.date||'').startsWith(selectedMonth)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const c={belum:0,progress:0,done:0};rows.forEach(x=>c[x.status||'belum']++);
+  document.getElementById('todo-count-belum').textContent=c.belum;document.getElementById('todo-count-progress').textContent=c.progress;document.getElementById('todo-count-done').textContent=c.done;
+  const g={};rows.forEach(x=>(g[x.date]||(g[x.date]=[])).push(x));
+  box.innerHTML=Object.entries(g).map(([date,items])=>`<div class="todo-day"><div class="todo-day-head"><strong>${formatDateMs(date)}</strong><span>${items.length} task</span></div>${items.map(x=>`<div class="todo-item ${sClass(x.status)}"><div><strong>${escapeHtml(x.title||'')}</strong><div class="todo-meta">${escapeHtml(x.category||'')} · ${sLabel(x.status)} · ${x.priority||'normal'}</div>${x.note?`<div class="todo-note">${escapeHtml(x.note)}</div>`:''}</div><div class="row-actions"><select data-todo-status="${x.id}"><option value="belum" ${x.status==='belum'?'selected':''}>Belum</option><option value="progress" ${x.status==='progress'?'selected':''}>In Progress</option><option value="done" ${x.status==='done'?'selected':''}>Done</option></select><button data-todo-edit="${x.id}">Edit</button><button class="danger" data-todo-delete="${x.id}">Padam</button></div></div>`).join('')}</div>`).join('')||'<div class="empty-state">Belum ada task.</div>';
+  document.querySelectorAll('[data-todo-status]').forEach(s=>s.onchange=async()=>{await db.collection('entries').doc(s.dataset.todoStatus).set({status:s.value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});await refreshSeedingTodo();});
+  document.querySelectorAll('[data-todo-edit]').forEach(b=>b.onclick=()=>editTodo(b.dataset.todoEdit));
+  document.querySelectorAll('[data-todo-delete]').forEach(b=>b.onclick=()=>delTodo(b.dataset.todoDelete));
+}
+function editTodo(id){const x=todoEntries.find(r=>r.id===id);if(!x)return;editingTodoId=id;todo-date.value=x.date||'';todo-priority.value=x.priority||'normal';todo-title.value=x.title||'';todo-status.value=x.status||'belum';todo-category.value=x.category||'Lain-lain';todo-note.value=x.note||'';document.getElementById('todo-submit-btn').textContent='Update Task';document.getElementById('todo-cancel-edit').style.display='';}
+async function delTodo(id){if(!confirm('Padam task ini?'))return;await db.collection('entries').doc(id).delete();await refreshSeedingTodo();}
+function resetTodo(){editingTodoId=null;document.getElementById('todo-submit-btn').textContent='Simpan Task';document.getElementById('todo-cancel-edit').style.display='none';todo-title.value='';todo-note.value='';todo-status.value='belum';todo-priority.value='normal';}
+
+async function refreshSeedingTodo(){await loadSeedingTodo();renderSeeding();renderTodo();}
+
+document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{
+  const sf=document.getElementById('seeding-form');if(sf&&!sf.dataset.bound){sf.onsubmit=async e=>{e.preventDefault();const date=seeding-date.value,data={kind:'intern_seeding',date,monthKey:date.slice(0,7),channel:seeding-channel.value,status:seeding-status.value,note:seeding-note.value.trim(),staffUid:currentUser?.uid||'',updatedAt:firebase.firestore.FieldValue.serverTimestamp()};if(editingSeedingId)await db.collection('entries').doc(editingSeedingId).set(data,{merge:true});else{data.createdAt=firebase.firestore.FieldValue.serverTimestamp();await db.collection('entries').add(data)}resetSeeding();await refreshSeedingTodo();toast('Seeding disimpan.');};sf.dataset.bound='1';document.getElementById('seeding-cancel-edit').onclick=resetSeeding;}
+  const tf=document.getElementById('todo-form');if(tf&&!tf.dataset.bound){tf.onsubmit=async e=>{e.preventDefault();const date=todo-date.value,data={kind:'intern_todo',date,monthKey:date.slice(0,7),priority:todo-priority.value,title:todo-title.value.trim(),status:todo-status.value,category:todo-category.value,note:todo-note.value.trim(),assignee:'Luqman',updatedAt:firebase.firestore.FieldValue.serverTimestamp()};if(editingTodoId)await db.collection('entries').doc(editingTodoId).set(data,{merge:true});else{data.createdAt=firebase.firestore.FieldValue.serverTimestamp();await db.collection('entries').add(data)}resetTodo();await refreshSeedingTodo();toast('Task disimpan.');};tf.dataset.bound='1';document.getElementById('todo-cancel-edit').onclick=resetTodo;}
+},400));
+document.addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b&&(b.dataset.view==='seeding'||b.dataset.view==='todo'))setTimeout(refreshSeedingTodo,50);});
+/* ===== END V6.3 ===== */
