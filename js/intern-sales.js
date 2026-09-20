@@ -464,12 +464,22 @@ function renderSeeding(){
   for(let d=1;d<=days;d++){const date=`${selectedMonth}-${String(d).padStart(2,'0')}`,items=rows.filter(x=>x.date===date);
     h+=`<div class="cal-cell"><div class="cal-day">${d}</div>${items.map(x=>`<div class="cal-item ${seedingPlatformClass(x.channel)}"><button class="cal-item-main" data-seeding-edit="${x.id}"><b>${escapeHtml(x.channel||'')}</b><span class="seed-type">${escapeHtml(x.seedType||'Seeding')}</span><small class="seed-status ${sClass(x.status)}">${sLabel(x.status)}</small></button><button class="cal-delete" data-seeding-delete="${x.id}" title="Padam">×</button></div>`).join('')}</div>`}
   cal.innerHTML=h;
-  tb.innerHTML=rows.length?rows.map(x=>`<tr><td>${formatDateMs(x.date)}</td><td><span class="platform-pill ${seedingPlatformClass(x.channel)}">${escapeHtml(x.channel||'')}</span></td><td>${escapeHtml(x.seedType||'Seeding')}</td><td><span class="status-chip ${sClass(x.status)}">${sLabel(x.status)}</span></td><td>${escapeHtml(x.note||'—')}</td><td><div class="row-actions"><button data-seeding-edit="${x.id}">Edit</button><button class="danger" data-seeding-delete="${x.id}">Padam</button></div></td></tr>`).join(''):'<tr><td colspan="6">Belum ada rekod.</td></tr>';
+  tb.innerHTML=rows.length?rows.map(x=>`<tr><td>${formatDate(x.date)}</td><td><span class="platform-pill ${seedingPlatformClass(x.channel)}">${escapeHtml(x.channel||'')}</span></td><td>${escapeHtml(x.seedType||'Seeding')}</td><td><span class="status-chip ${sClass(x.status)}">${sLabel(x.status)}</span></td><td>${escapeHtml(x.note||'—')}</td><td><div class="row-actions"><button data-seeding-edit="${x.id}">Edit</button><button class="danger" data-seeding-delete="${x.id}">Padam</button></div></td></tr>`).join(''):'<tr><td colspan="6">Belum ada rekod.</td></tr>';
   document.querySelectorAll('[data-seeding-edit]').forEach(b=>b.onclick=()=>editSeeding(b.dataset.seedingEdit));
   document.querySelectorAll('[data-seeding-delete]').forEach(b=>b.onclick=()=>delSeeding(b.dataset.seedingDelete));
 }
 function editSeeding(id){const x=seedingEntries.find(r=>r.id===id);if(!x)return;editingSeedingId=id;document.getElementById('seeding-date').value=x.date||'';document.getElementById('seeding-channel').value=x.channel||'Facebook Page';document.getElementById('seeding-type').value=x.seedType||'Seeding';document.getElementById('seeding-status').value=x.status||'belum';document.getElementById('seeding-note').value=x.note||'';document.getElementById('seeding-submit-btn').textContent='Update Seeding';document.getElementById('seeding-cancel-edit').style.display='';}
-async function delSeeding(id){if(!confirm('Padam rekod seeding ini?'))return;await db.collection('entries').doc(id).delete();await refreshSeedingTodo();}
+async function delSeeding(id){
+  if(!confirm('Padam rekod seeding ini?'))return;
+  try{
+    await db.collection('entries').doc(id).delete();
+    await refreshSeedingTodo();
+    toast('Rekod seeding berjaya dipadam.');
+  }catch(err){
+    console.error('delSeeding',err);
+    toast('Tak dapat padam rekod. Semak Firebase permission.','error');
+  }
+}
 function resetSeeding(){editingSeedingId=null;document.getElementById('seeding-submit-btn').textContent='Simpan Seeding';document.getElementById('seeding-cancel-edit').style.display='none';document.getElementById('seeding-note').value='';document.getElementById('seeding-status').value='belum';}
 
 function renderTodo(){
@@ -478,13 +488,23 @@ function renderTodo(){
   const c={belum:0,progress:0,done:0};rows.forEach(x=>c[x.status||'belum']++);
   document.getElementById('todo-count-belum').textContent=c.belum;document.getElementById('todo-count-progress').textContent=c.progress;document.getElementById('todo-count-done').textContent=c.done;
   const g={};rows.forEach(x=>(g[x.date]||(g[x.date]=[])).push(x));
-  box.innerHTML=Object.entries(g).map(([date,items])=>`<div class="todo-day"><div class="todo-day-head"><strong>${formatDateMs(date)}</strong><span>${items.length} task</span></div>${items.map(x=>`<div class="todo-item ${sClass(x.status)}"><div><strong>${escapeHtml(x.title||'')}</strong><div class="todo-meta">${escapeHtml(x.category||'')} · ${sLabel(x.status)} · ${x.priority||'normal'}</div>${x.note?`<div class="todo-note">${escapeHtml(x.note)}</div>`:''}</div><div class="row-actions"><select data-todo-status="${x.id}"><option value="belum" ${x.status==='belum'?'selected':''}>Belum</option><option value="progress" ${x.status==='progress'?'selected':''}>In Progress</option><option value="done" ${x.status==='done'?'selected':''}>Done</option></select><button data-todo-edit="${x.id}">Edit</button><button class="danger" data-todo-delete="${x.id}">Padam</button></div></div>`).join('')}</div>`).join('')||'<div class="empty-state">Belum ada task.</div>';
+  box.innerHTML=Object.entries(g).map(([date,items])=>`<div class="todo-day"><div class="todo-day-head"><strong>${formatDate(date)}</strong><span>${items.length} task</span></div>${items.map(x=>`<div class="todo-item ${sClass(x.status)}"><div><strong>${escapeHtml(x.title||'')}</strong><div class="todo-meta">${escapeHtml(x.category||'')} · ${sLabel(x.status)} · ${x.priority||'normal'}</div>${x.note?`<div class="todo-note">${escapeHtml(x.note)}</div>`:''}</div><div class="row-actions"><select data-todo-status="${x.id}"><option value="belum" ${x.status==='belum'?'selected':''}>Belum</option><option value="progress" ${x.status==='progress'?'selected':''}>In Progress</option><option value="done" ${x.status==='done'?'selected':''}>Done</option></select><button data-todo-edit="${x.id}">Edit</button><button class="danger" data-todo-delete="${x.id}">Padam</button></div></div>`).join('')}</div>`).join('')||'<div class="empty-state">Belum ada task.</div>';
   document.querySelectorAll('[data-todo-status]').forEach(s=>s.onchange=async()=>{await db.collection('entries').doc(s.dataset.todoStatus).set({status:s.value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});await refreshSeedingTodo();});
   document.querySelectorAll('[data-todo-edit]').forEach(b=>b.onclick=()=>editTodo(b.dataset.todoEdit));
   document.querySelectorAll('[data-todo-delete]').forEach(b=>b.onclick=()=>delTodo(b.dataset.todoDelete));
 }
 function editTodo(id){const x=todoEntries.find(r=>r.id===id);if(!x)return;editingTodoId=id;document.getElementById('todo-date').value=x.date||'';document.getElementById('todo-priority').value=x.priority||'normal';document.getElementById('todo-title').value=x.title||'';document.getElementById('todo-status').value=x.status||'belum';document.getElementById('todo-category').value=x.category||'Lain-lain';document.getElementById('todo-note').value=x.note||'';document.getElementById('todo-submit-btn').textContent='Update Task';document.getElementById('todo-cancel-edit').style.display='';}
-async function delTodo(id){if(!confirm('Padam task ini?'))return;await db.collection('entries').doc(id).delete();await refreshSeedingTodo();}
+async function delTodo(id){
+  if(!confirm('Padam task ini?'))return;
+  try{
+    await db.collection('entries').doc(id).delete();
+    await refreshSeedingTodo();
+    toast('Task berjaya dipadam.');
+  }catch(err){
+    console.error('delTodo',err);
+    toast('Tak dapat padam task. Semak Firebase permission.','error');
+  }
+}
 function resetTodo(){editingTodoId=null;document.getElementById('todo-submit-btn').textContent='Simpan Task';document.getElementById('todo-cancel-edit').style.display='none';document.getElementById('todo-title').value='';document.getElementById('todo-note').value='';document.getElementById('todo-status').value='belum';document.getElementById('todo-priority').value='normal';}
 
 async function refreshSeedingTodo(){await loadSeedingTodo();renderSeeding();renderTodo();}
